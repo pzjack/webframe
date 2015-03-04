@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-tomcat-run</actionName>
+            <displayName>tomcat-run</displayName>
+            <goals>
+                <goal>tomcat7:run</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-tomcat-debug</actionName>
+            <displayName>tomcat-debug</displayName>
+            <goals>
+                <goal>tomcat7:run</goal>
+            </goals>
+            <properties>
+                <jpda.listen>maven</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-jetty-run</actionName>
+            <displayName>jetty-run</displayName>
+            <goals>
+                <goal>jetty:run</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-clean:clean</actionName>
+            <displayName>clean:clean</displayName>
+            <goals>
+                <goal>clean:clean</goal>
+            </goals>
+        </action>
+    </actions>
