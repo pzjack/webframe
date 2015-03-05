@@ -3,3 +3,35 @@
   mysql:dealer_id bigint,dealer_name varchar(60)
   oracle:dealer_id number(20), dealer_name varchar2(60)
 3.报量汇总表和报量明细表同样添加以上两个字段
+
+4.新增经销商领取牛奶实体对象
+  新增表dealer_dispatch_record
+  mysql：
+     CREATE TABLE dealer_dispatch_record (
+        id BIGINT NOT NULL auto_increment,
+        dealer_id BIGINT,
+        dealer_name varchar(60),
+        product_id BIGINT,
+        product_name varchar(60),
+        product_type INT,
+        product_num BIGINT,
+        user_id BIGINT,
+        user_name varchar(60),
+        sign_delete BIT,
+        createdate DATETIME,
+        primary key (id)
+     ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+   oracle:
+     CREATE TABLE dealer_dispatch_record (
+        id NUMBER(20) NOT NULL PRIMARY KEY,
+        dealer_id NUMBER(20) DEFAULT NULL,
+        dealer_name VARCHAR2(60) DEFAULT NULL,
+        product_id NUMBER(20) DEFAULT NULL,
+        product_name VARCHAR2(60) DEFAULT NULL,
+        product_type NUMBER DEFAULT NULL,
+        product_num NUMBER DEFAULT 0,
+        user_id NUMBER(20) DEFAULT NULL,
+        user_name VARCHAR2(60) DEFAULT NULL,
+        sign_delete NUMBER(1) DEFAULT 0,
+        createdate TIMESTAMP
+     )
