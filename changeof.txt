@@ -1,5 +1,0 @@
-1.增加经销商相关角色（不同于1.0版的等同于奶站的经销商）
-2.组织机构增加两个字段，仅在奶站的时候表示奶站所属的经销商
-  mysql:dealer_id bigint,dealer_name varchar(60)
-  oracle:dealer_id number(20), dealer_name varchar2(60)
-3.报量汇总表和报量明细表同样添加以上两个字段

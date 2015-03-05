@@ -229,11 +229,6 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
         everyOrgReport.setOrgtype(nz.getType());
         everyOrgReport.setResponsibleman(nz.getResponsible_man());
         everyOrgReport.setResponsiblephone(nz.getPhone());
-        
-        if(null != nz.getDealer()) {
-            everyOrgReport.setDealer(nz.getDealer());
-            everyOrgReport.setDealer_name(nz.getDealer().getName());
-        }
         return everyOrgReport;
     }
 
@@ -304,9 +299,8 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
 //                            page = reportSubscribeNumberService.queryLinebyYear(pr, new Integer(req.getDate().trim()));
 //                        }
                     }
-                } else {
-                    page = reportSubscribeNumberService.queryLinebyYear(pr, new Integer(req.getDate().trim()));
                 }
+                page = reportSubscribeNumberService.queryLinebyYear(pr, new Integer(req.getDate().trim()));
             } else if ("quater".equalsIgnoreCase(req.getTimetype())) {
                 int p = req.getDate().indexOf("-");
                 if (p > 0) {
@@ -345,9 +339,8 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
                                 page = reportSubscribeNumberService.queryLinebyYearmonthday(pr, year, month, day, req.getQuery());
                             }
                         }
-                    } else {
-                        page = reportSubscribeNumberService.queryLinebyYearmonthday(pr, year, month, day);
                     }
+                    page = reportSubscribeNumberService.queryLinebyYearmonthday(pr, year, month, day);
                 }
             }
         }
