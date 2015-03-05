@@ -186,6 +186,10 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
         r.setMonth(month);
         r.setDay(day);
         r.setOrg(nz);
+        if (null != nz.getDealer()) {
+            r.setDealer(nz.getDealer());
+            r.setDealer_name(nz.getDealer().getName());
+        }
         r.setOrgname(nz.getName());
         if (null != nzmanager) {
             r.setReportman(nzmanager);
@@ -322,6 +326,10 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
             r.setDay(day);
             r.setOrg(nz);
             r.setOrgname(nz.getName());
+            if (null != nz.getDealer()) {
+                r.setDealer(nz.getDealer());
+                r.setDealer_name(nz.getDealer().getName());
+            }
             r.setReportman(nzmanager);
             r.setReportname(nzmanager.getRealname());
             r.setReportstate(EveryDayEveryOrgReportService.REPORT_STATE_REPORTTED);
