@@ -40,6 +40,8 @@ public class SysOranizagion extends EntityExt implements java.io.Serializable {
     private String province_name;
     private String city_name;
     private String region_name;
+    private SysOranizagion dealer;
+    private String dealer_name;
 
     /**
      * @return the parent
@@ -303,5 +305,35 @@ public class SysOranizagion extends EntityExt implements java.io.Serializable {
      */
     public void setRegion_name(String region_name) {
         this.region_name = region_name;
+    }
+
+    /**
+     * @return the dealer
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dealer_id")
+    public SysOranizagion getDealer() {
+        return dealer;
+    }
+
+    /**
+     * @param dealer the dealer to set
+     */
+    public void setDealer(SysOranizagion dealer) {
+        this.dealer = dealer;
+    }
+
+    /**
+     * @return the dealer_name
+     */
+    public String getDealer_name() {
+        return dealer_name;
+    }
+
+    /**
+     * @param dealer_name the dealer_name to set
+     */
+    public void setDealer_name(String dealer_name) {
+        this.dealer_name = dealer_name;
     }
 }

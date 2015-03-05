@@ -43,6 +43,8 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
     private String reportno;//报量编号
     private EveryDayEveryOrgReport everyDayEveryOrgReport;//报量单位信息
     
+    private SysOranizagion dealer;
+    private String dealer_name;
     
     public ReportSubscribeNumber () {};
     public ReportSubscribeNumber(UserProduct product, long distrutenum) {
@@ -307,5 +309,35 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
      */
     public void setEveryDayEveryOrgReport(EveryDayEveryOrgReport everyDayEveryOrgReport) {
         this.everyDayEveryOrgReport = everyDayEveryOrgReport;
+    }
+
+    /**
+     * @return the dealer
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dealer_id")
+    public SysOranizagion getDealer() {
+        return dealer;
+    }
+
+    /**
+     * @param dealer the dealer to set
+     */
+    public void setDealer(SysOranizagion dealer) {
+        this.dealer = dealer;
+    }
+
+    /**
+     * @return the dealer_name
+     */
+    public String getDealer_name() {
+        return dealer_name;
+    }
+
+    /**
+     * @param dealer_name the dealer_name to set
+     */
+    public void setDealer_name(String dealer_name) {
+        this.dealer_name = dealer_name;
     }
 }
