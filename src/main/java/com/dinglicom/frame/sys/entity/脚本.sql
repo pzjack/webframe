@@ -396,3 +396,20 @@ create table continue_order_push (
  createdate DATETIME,
  primary key (id)
 ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+
+
+
+create table dealer_dispatch_record (
+ id BIGINT not null auto_increment,
+ dealer_id BIGINT,
+ dealer_name varchar(60),
+ product_id BIGINT,
+ product_name varchar(60),
+ product_type INT,
+ product_num BIGINT,
+ user_id BIGINT,
+ user_name varchar(60),
+ sign_delete BIT,
+ createdate DATETIME,
+ primary key (id)
+) ENGINE= InnoDB DEFAULT CHARSET=utf8;
