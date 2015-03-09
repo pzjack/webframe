@@ -48,7 +48,6 @@ public class EveryDayEveryOrgReport extends EntityExt implements Serializable {
     private String shipphone;//出货人联系电话
     
     private SysOranizagion dealer;
-    private String dealer_name;
 
     /**
      * @return the year
@@ -322,19 +321,5 @@ public class EveryDayEveryOrgReport extends EntityExt implements Serializable {
      */
     public void setDealer(SysOranizagion dealer) {
         this.dealer = dealer;
-    }
-
-    /**
-     * @return the dealer_name
-     */
-    public String getDealer_name() {
-        return dealer_name;
-    }
-
-    /**
-     * @param dealer_name the dealer_name to set
-     */
-    public void setDealer_name(String dealer_name) {
-        this.dealer_name = dealer_name;
     }
 }

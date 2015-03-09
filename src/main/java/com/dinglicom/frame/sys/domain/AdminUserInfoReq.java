@@ -35,6 +35,8 @@ public class AdminUserInfoReq extends AdminReqBase {
     private String tel;
     private Long sup_id;
     private String sup_name;
+    private Long did;
+    private String dname;
 
     /**
      * @return the account
@@ -271,5 +273,33 @@ public class AdminUserInfoReq extends AdminReqBase {
      */
     public void setManager(String manager) {
         this.manager = manager;
+    }
+
+    /**
+     * @return the did
+     */
+    public Long getDid() {
+        return did;
+    }
+
+    /**
+     * @param did the did to set
+     */
+    public void setDid(Long did) {
+        this.did = did;
+    }
+
+    /**
+     * @return the dname
+     */
+    public String getDname() {
+        return dname;
+    }
+
+    /**
+     * @param dname the dname to set
+     */
+    public void setDname(String dname) {
+        this.dname = dname;
     }
 }

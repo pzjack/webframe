@@ -2,36 +2,74 @@
 2.组织机构增加两个字段，仅在奶站的时候表示奶站所属的经销商
   mysql:dealer_id bigint,dealer_name varchar(60)
   oracle:dealer_id number(20), dealer_name varchar2(60)
-3.报量汇总表和报量明细表同样添加以上两个字段
+3.报量汇总表和报量明细表同样添加如下字段
+  mysql:dealer_id bigint(,product_type INT 仅报量明细)
+  oracle:dealer_id number(20)(,product_type number 仅报量明细)
 
 4.新增经销商领取牛奶实体对象
-  新增表dealer_dispatch_record
+  新增表dealer_dispatch
   mysql：
      CREATE TABLE dealer_dispatch_record (
         id BIGINT NOT NULL auto_increment,
         dealer_id BIGINT,
         dealer_name varchar(60),
+        dealer_manager varchar(60),
+        dispath_state varchar(20),
         product_id BIGINT,
         product_name varchar(60),
         product_type INT,
         product_num BIGINT,
+        dispathing_date DATETIME,
         user_id BIGINT,
         user_name varchar(60),
         sign_delete BIT,
         createdate DATETIME,
         primary key (id)
      ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+
+     CREATE TABLE dealer_dispatch_item_detail (
+        id BIGINT NOT NULL auto_increment,
+        dealer_id BIGINT,
+        dealer_name varchar(60),
+        dealer_manager varchar(60),
+        work_station_id BIGINT,
+        station_name varchar(60),
+        station_manager varchar(60),
+        station_phone varchar(30),
+        station_address varchar(300),
+        dealer_dispatching_id  BIGINT,
+        dispath_state varchar(20),
+        dispathing_date DATETIME,
+        product_id BIGINT,
+        product_name varchar(60),
+        product_type INT,
+        distrute_num BIGINT,
+        sign_delete BIT,
+        createdate DATETIME,
+        primary key (id)
+     ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
    oracle:
-     CREATE TABLE dealer_dispatch_record (
+     CREATE TABLE dealer_dispatch (
         id NUMBER(20) NOT NULL PRIMARY KEY,
         dealer_id NUMBER(20) DEFAULT NULL,
         dealer_name VARCHAR2(60) DEFAULT NULL,
+        dealer_manager VARCHAR2(60) DEFAULT NULL,
+        work_station_id NUMBER(20) DEFAULT NULL,
+        station_name VARCHAR2(60) DEFAULT NULL,
+        station_manager VARCHAR2(60) DEFAULT NULL,
+        station_phone VARCHAR2(30) DEFAULT NULL,
+        station_address VARCHAR2(300) DEFAULT NULL,
+        dealer_dispatching_id  NUMBER(20) DEFAULT NULL,
+        dispath_state VARCHAR2(20) DEFAULT NULL,
+        dispathing_date DATETIME DEFAULT NULL,
         product_id NUMBER(20) DEFAULT NULL,
         product_name VARCHAR2(60) DEFAULT NULL,
         product_type NUMBER DEFAULT NULL,
-        product_num NUMBER DEFAULT 0,
-        user_id NUMBER(20) DEFAULT NULL,
-        user_name VARCHAR2(60) DEFAULT NULL,
+        distrute_num NUMBER DEFAULT 0,
         sign_delete NUMBER(1) DEFAULT 0,
         createdate TIMESTAMP
      )
+
+5.user_info表增加字段：
+  mysql:dealer_id bigint,dealer_name varchar(60)
+  oracle:dealer_id number(20), dealer_name varchar2(60)

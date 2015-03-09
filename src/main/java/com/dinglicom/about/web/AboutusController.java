@@ -32,9 +32,9 @@ public class AboutusController extends AppControllerBase {
 
     private final static Logger LOG = LoggerFactory.getLogger(AboutusController.class);
     @Resource
-    protected SysTokenService sysTokenService;
+    private SysTokenService sysTokenService;
     @Resource
-    protected AboutusServcice aboutusServcice;
+    private AboutusServcice aboutusServcice;
 
     @RequestMapping(value = "/get")
     public @ResponseBody

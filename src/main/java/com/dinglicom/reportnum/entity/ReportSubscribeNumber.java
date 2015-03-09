@@ -33,6 +33,7 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
     private String orgname;//上报单位名称
     private UserProduct product;//产品
     private String productname;//产品名称
+    private Integer producttype;//产品分类
     private long distrutenum;//计算上报量
     private long minusnum;//减少报量（退订报量）
     private long plusnum;//增加报量
@@ -44,7 +45,6 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
     private EveryDayEveryOrgReport everyDayEveryOrgReport;//报量单位信息
     
     private SysOranizagion dealer;
-    private String dealer_name;
     
     public ReportSubscribeNumber () {};
     public ReportSubscribeNumber(UserProduct product, long distrutenum) {
@@ -172,6 +172,21 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
      */
     public void setProductname(String productname) {
         this.productname = productname;
+    }
+
+    /**
+     * @return the producttype
+     */
+    @Column(name = "product_type")
+    public Integer getProducttype() {
+        return producttype;
+    }
+
+    /**
+     * @param producttype the producttype to set
+     */
+    public void setProducttype(Integer producttype) {
+        this.producttype = producttype;
     }
 
     /**
@@ -325,19 +340,5 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
      */
     public void setDealer(SysOranizagion dealer) {
         this.dealer = dealer;
-    }
-
-    /**
-     * @return the dealer_name
-     */
-    public String getDealer_name() {
-        return dealer_name;
-    }
-
-    /**
-     * @param dealer_name the dealer_name to set
-     */
-    public void setDealer_name(String dealer_name) {
-        this.dealer_name = dealer_name;
     }
 }

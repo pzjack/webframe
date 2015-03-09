@@ -76,6 +76,12 @@ public class SysOranizagionServiceImpl implements SysOranizagionService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<SysOranizagion> findAllDealer() {
+        return sysOranizagionDao.findByType(SysOranizagionService.ORG_TYPE_DEALER, Boolean.FALSE);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<WorkerOrgRespItem> findAllWorkerOrg(WorkerOrgReq req) {
         return sysOranizagionDao.findWorkerStation(SysOranizagionService.ORG_TYPE_NZH, req.getProvince(), req.getCity(), req.getRegion(), Boolean.FALSE);
     }

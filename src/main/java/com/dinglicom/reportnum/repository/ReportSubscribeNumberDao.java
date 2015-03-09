@@ -40,6 +40,10 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
 
     @Query(" from ReportSubscribeNumber a where a.everyDayEveryOrgReport.id=:everyId")
     List<ReportSubscribeNumber> findByeveryDayEveryOrgReportId(@Param(value = "everyId") long everyId);
+    
+    
+    @Query(" from ReportSubscribeNumber a where a.dealer.id=:dealerid and a.year=:year and a.month=:month and a.day=:day")
+    List<ReportSubscribeNumber> findByDealerYearmonthday(@Param(value = "dealerid") Long dealerid, @Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "day") int day);
 
     //以下部分统计业务员接口中各个产品的销售情况
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.id in (select b.id from SysOranizagion b where b.userinfo.id=:salesid and b.signDelete=:signDelete) and a.year=:year and a.month=:month group by a.product,a.productname")

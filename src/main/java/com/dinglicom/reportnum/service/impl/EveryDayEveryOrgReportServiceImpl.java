@@ -232,7 +232,6 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
         
         if(null != nz.getDealer()) {
             everyOrgReport.setDealer(nz.getDealer());
-            everyOrgReport.setDealer_name(nz.getDealer().getName());
         }
         return everyOrgReport;
     }

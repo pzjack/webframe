@@ -140,7 +140,7 @@
             </props>
         </property>
         <!-- 启动时延期300秒开始任务 -->
-        <property name="startupDelay" value="300" />
+        <property name="startupDelay" value="30" />
     </bean>
 
     <!-- Cron式Trigger按照奶站生成配送单定义 -->
@@ -151,12 +151,12 @@
     <!-- Cron式Trigger按照单位计算报量定义 -->
     <bean id="cronTriggerReport" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobReport" />
-        <property name="cronExpression" value="0 30 0 * * ?" />
+        <property name="cronExpression" value="0 52 18 * * ?" />
     </bean>
     <!-- Cron式Trigger自动报量 -->
     <bean id="cronTriggerAutoReport" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobAutoReport" />
-        <property name="cronExpression" value="0 38 23 * * ?" />
+        <property name="cronExpression" value="0 53 18 * * ?" />
     </bean>
 
     <!-- JobDetajil, 基于MethodInvokingJobDetailFactoryBean调用普通Spring Bean -->

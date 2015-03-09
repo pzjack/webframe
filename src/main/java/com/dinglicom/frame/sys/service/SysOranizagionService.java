@@ -47,6 +47,8 @@ public interface SysOranizagionService {
     List<SysOranizagion> findAllWorkerOrg();
     
     List<SysOranizagion> findAllDeliveryOrg();
+    
+    List<SysOranizagion> findAllDealer();
 
     /**
      * 查找所有奶站

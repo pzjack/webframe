@@ -116,6 +116,11 @@ public class DateUtil {
         c = getOneDayMaxtime(c);
         return c.getTime();
     }
+    
+    public static Calendar getPreDay(Calendar c, int day) {
+        c.add(Calendar.DAY_OF_MONTH, -day);
+        return c;
+    }
 
     /**
      * 获取参照时间day天以后的日期

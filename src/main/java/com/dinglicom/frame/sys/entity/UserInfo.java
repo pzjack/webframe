@@ -46,6 +46,8 @@ public class UserInfo extends EntityExt  implements java.io.Serializable {
     private String baiduid;
     private Long managerid;
     private String manager;
+    private Long did;
+    private String dname;
     
     public UserInfo() {}
     public UserInfo(long id, String name, String phone) {
@@ -389,5 +391,35 @@ public class UserInfo extends EntityExt  implements java.io.Serializable {
      */
     public void setManager(String manager) {
         this.manager = manager;
+    }
+
+    /**
+     * @return the did
+     */
+    @Column(name = "dealer_id")
+    public Long getDid() {
+        return did;
+    }
+
+    /**
+     * @param did the did to set
+     */
+    public void setDid(Long did) {
+        this.did = did;
+    }
+
+    /**
+     * @return the dname
+     */
+    @Column(name = "dealer_name")
+    public String getDname() {
+        return dname;
+    }
+
+    /**
+     * @param dname the dname to set
+     */
+    public void setDname(String dname) {
+        this.dname = dname;
     }
 }

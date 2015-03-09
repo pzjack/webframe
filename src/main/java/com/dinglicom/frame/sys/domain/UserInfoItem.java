@@ -37,11 +37,13 @@ public class UserInfoItem {
     private Long rid;
     private Long sup_id;
     private String sup_name;
+    private Long did;
+    private String dname;
 
     public UserInfoItem() {
     }
 
-    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name) {
+    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name, Long did, String dname) {
         this.uid = uid;
         this.account = account;
         this.role = role;
@@ -60,10 +62,12 @@ public class UserInfoItem {
         this.tel = tel;
         this.sup_id = sup_id;
         this.sup_name = sup_name;
+            this.did = did;
+            this.dname = dname;
     }
 
-    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name, String nickname) {
-        this(uid, account, role, sex, id_number, realname, birthday, pid, province, cid, city, rid, region, address, desc, tel, sup_id, sup_name);
+    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name, String nickname, Long did, String dname) {
+        this(uid, account, role, sex, id_number, realname, birthday, pid, province, cid, city, rid, region, address, desc, tel, sup_id, sup_name, did, dname);
         if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(role) || UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(role)) {
             this.sup_id = sup_id;
             this.sup_name = sup_name;
@@ -71,8 +75,8 @@ public class UserInfoItem {
         }
     }
     
-    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name, Long managerid, String manager, String nickname) {
-        this(uid, account, role, sex, id_number, realname, birthday, pid, province, cid, city, rid, region, address, desc, tel, sup_id, sup_name);
+    public UserInfoItem(Long uid, String account, String role, String sex, String id_number, String realname, Date birthday, Long pid, String province, Long cid, String city, Long rid, String region, String address, String desc, String tel, Long sup_id, String sup_name, Long managerid, String manager, String nickname, Long did, String dname) {
+        this(uid, account, role, sex, id_number, realname, birthday, pid, province, cid, city, rid, region, address, desc, tel, sup_id, sup_name, did, dname);
         if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(role) || UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(role)) {
             this.sup_id = managerid;
             this.sup_name = manager;
@@ -344,5 +348,33 @@ public class UserInfoItem {
      */
     public void setManager(String manager) {
         this.manager = manager;
+    }
+
+    /**
+     * @return the did
+     */
+    public Long getDid() {
+        return did;
+    }
+
+    /**
+     * @param did the did to set
+     */
+    public void setDid(Long did) {
+        this.did = did;
+    }
+
+    /**
+     * @return the dname
+     */
+    public String getDname() {
+        return dname;
+    }
+
+    /**
+     * @param dname the dname to set
+     */
+    public void setDname(String dname) {
+        this.dname = dname;
     }
 }

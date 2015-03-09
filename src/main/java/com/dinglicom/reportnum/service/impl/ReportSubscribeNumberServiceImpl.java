@@ -188,7 +188,6 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
         r.setOrg(nz);
         if (null != nz.getDealer()) {
             r.setDealer(nz.getDealer());
-            r.setDealer_name(nz.getDealer().getName());
         }
         r.setOrgname(nz.getName());
         if (null != nzmanager) {
@@ -318,7 +317,8 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
 //            }
             UserProduct product = userProductService.read(rsp.getProduct_id());
             r.setProduct(product);
-            r.setProductname(product.getName());
+            r.setProductname(product.getShortname());
+            r.setProducttype(product.getProducttype());
             totalNum += r.getReportnum();
             r.setYear(year);
             r.setQuarter(DateUtil.getQuarter(c));
@@ -328,7 +328,6 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
             r.setOrgname(nz.getName());
             if (null != nz.getDealer()) {
                 r.setDealer(nz.getDealer());
-                r.setDealer_name(nz.getDealer().getName());
             }
             r.setReportman(nzmanager);
             r.setReportname(nzmanager.getRealname());
@@ -382,5 +381,10 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     @Override
     public Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, Integer year, Integer month, Integer day) {
         return reportSubscribeNumberDao.queryLinebyYearmonthday(page, year, month, day);
+    }
+
+    @Override
+    public List<ReportSubscribeNumber> findByDealerAndDate(Long dealerId, Integer year, Integer month, Integer day) {
+         return reportSubscribeNumberDao.findByDealerYearmonthday(dealerId, year, month, day);
     }
 }

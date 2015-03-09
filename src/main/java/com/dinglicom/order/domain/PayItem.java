@@ -21,6 +21,7 @@ public class PayItem {
     private String address;
     private String product;
     private Integer amount;
+    private Date create_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date start_date;
@@ -34,13 +35,14 @@ public class PayItem {
     private Date dtime;
     
     public PayItem() {}
-    public PayItem (Long id, String consigneename, String consigneephone, String consigneeaddress, String  productname, Integer productnum, Date firstDistributionDate, Date endDistributionDate, Double productTotalPrice, String payname, Date paytime) {
+    public PayItem (Long id, String consigneename, String consigneephone, String consigneeaddress, String  productname, Integer productnum, Date createDate, Date firstDistributionDate, Date endDistributionDate, Double productTotalPrice, String payname, Date paytime) {
         this.id = id;
         this.name = consigneename;
         this.tel = consigneephone;
         this.address = consigneeaddress;
         this.product = productname;
         this.amount = productnum;
+        this.create_date = createDate;
         this.start_date = firstDistributionDate;
         this.end_date = endDistributionDate;
         this.total_price = productTotalPrice;
@@ -200,5 +202,19 @@ public class PayItem {
      */
     public void setDtime(Date dtime) {
         this.dtime = dtime;
+    }
+
+    /**
+     * @return the create_date
+     */
+    public Date getCreate_date() {
+        return create_date;
+    }
+
+    /**
+     * @param create_date the create_date to set
+     */
+    public void setCreate_date(Date create_date) {
+        this.create_date = create_date;
     }
 }

@@ -67,6 +67,6 @@ public interface UserOrderDao extends PagingAndSortingRepository<UserOrder, Long
     @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where (a.orderNo like :query or a.consigneename like :query  or a.consigneephone like :query) and a.signDelete = :signDelete")
     List<WebOrderItemResp> queryAllOrderItem(@Param(value = "query") String query, @Param(value = "signDelete") Boolean signDelete);
     
-    @Query("select new com.dinglicom.order.domain.PayItem(id, consigneename, consigneephone, consigneeaddress, productname, productnum, firstDistributionDate, endDistributionDate, productTotalPrice, payname, paytime) from UserOrder a where a.orderState>=:orderstate and a.userPay=:userPay and a.signDelete = :signDelete")
+    @Query("select new com.dinglicom.order.domain.PayItem(id, consigneename, consigneephone, consigneeaddress, productname, productnum, createDate, firstDistributionDate, endDistributionDate, productTotalPrice, payname, paytime) from UserOrder a where a.orderState>=:orderstate and a.userPay=:userPay and a.signDelete = :signDelete")
     Page<PayItem> queryOrderPay(Pageable page, @Param(value = "orderstate") String orderstate, @Param(value = "userPay") Boolean userPay, @Param(value = "signDelete") Boolean signDelete);
 }

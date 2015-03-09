@@ -63,7 +63,7 @@ public interface ReportSubscribeNumberService {
      * @param orgname
      * @return 
      */
-    Page<LineDataTmp> queryLinebyYear(Pageable page, @Param(value = "year") Integer year, @Param(value = "orgname")String orgname);
+    Page<LineDataTmp> queryLinebyYear(Pageable page, Integer year, String orgname);
     
     /**
      * 年的线路送货查询
@@ -71,7 +71,7 @@ public interface ReportSubscribeNumberService {
      * @param year
      * @return 
      */
-    Page<LineDataTmp> queryLinebyYear(Pageable page, @Param(value = "year") Integer year);
+    Page<LineDataTmp> queryLinebyYear(Pageable page, Integer year);
     
     /**
      * 任意一天奶站的线路送货明细
@@ -82,7 +82,7 @@ public interface ReportSubscribeNumberService {
      * @param orgname
      * @return 
      */
-    Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, @Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "orgname")String orgname);
+    Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, Integer year, Integer month, Integer day, String orgname);
     
     /**
      * 任意一天线路送货明细
@@ -92,5 +92,15 @@ public interface ReportSubscribeNumberService {
      * @param day
      * @return 
      */
-    Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, @Param(value = "year") Integer year,@Param(value = "month") Integer month, @Param(value = "day") Integer day);
+    Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, Integer year,Integer month, Integer day);
+    
+    /**
+     * 查询特定经销商某一天的报量明细
+     * @param dealerId
+     * @param year
+     * @param month
+     * @param day
+     * @return 
+     */
+    List<ReportSubscribeNumber> findByDealerAndDate(Long dealerId, Integer year,Integer month, Integer day);
 }
