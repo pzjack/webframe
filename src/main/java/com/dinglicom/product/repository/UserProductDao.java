@@ -31,7 +31,7 @@ public interface UserProductDao extends PagingAndSortingRepository<UserProduct, 
     Page<WebUserProduct> findByNotDelete(Pageable page,  @Param(value="signDelete")Boolean signDelete);
     
     
-    @Query("select new com.dinglicom.product.domain.ProductItem(id, name) from UserProduct a where a.signDelete=:signDelete")
+    @Query("select new com.dinglicom.product.domain.ProductItem(id, shortname) from UserProduct a where a.signDelete=:signDelete")
     List<ProductItem> findByAllProduct(@Param(value="signDelete")Boolean signDelete);
     
     

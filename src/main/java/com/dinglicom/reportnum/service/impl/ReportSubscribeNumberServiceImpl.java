@@ -177,7 +177,8 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
         UserProduct product = ps.get(pid);
         if (null != product) {
             r.setProduct(product);
-            r.setProductname(product.getName());
+            r.setProductname(product.getShortname());
+            r.setProducttype(product.getProducttype());
         }
         r.setDistrutenum(amount);
         r.setReportnum(r.getDistrutenum() - r.getMinusnum() + r.getPlusnum());

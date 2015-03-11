@@ -17,57 +17,41 @@
 package com.dinglicom.dealerdispathing.domain;
 
 import com.dinglicom.frame.sys.domain.BaseMsgBean;
-import com.dinglicom.product.domain.ProductItem;
 import java.util.List;
 
 /**
  *
  * @author panzhen
  */
-public class DealerDispatchResp extends BaseMsgBean {
-    private Long total_num;
-    private List<ProductItem> products;
-    private List<DealerDispatchRespItem> data;
+public class DealerDispatchOnedayResp extends BaseMsgBean {
+    private Integer total_page;
+    private List<DealerDispatchOnedayItem> data;
 
     /**
-     * @return the total_num
+     * @return the total_page
      */
-    public Long getTotal_num() {
-        return total_num;
+    public Integer getTotal_page() {
+        return total_page;
     }
 
     /**
-     * @param total_num the total_num to set
+     * @param total_page the total_page to set
      */
-    public void setTotal_num(Long total_num) {
-        this.total_num = total_num;
-    }
-
-    /**
-     * @return the products
-     */
-    public List<ProductItem> getProducts() {
-        return products;
-    }
-
-    /**
-     * @param products the products to set
-     */
-    public void setProducts(List<ProductItem> products) {
-        this.products = products;
+    public void setTotal_page(Integer total_page) {
+        this.total_page = total_page;
     }
 
     /**
      * @return the data
      */
-    public List<DealerDispatchRespItem> getData() {
+    public List<DealerDispatchOnedayItem> getData() {
         return data;
     }
 
     /**
      * @param data the data to set
      */
-    public void setData(List<DealerDispatchRespItem> data) {
+    public void setData(List<DealerDispatchOnedayItem> data) {
         this.data = data;
     }
 }

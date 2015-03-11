@@ -16,6 +16,12 @@
 
 package com.dinglicom.dealerdispathing.service;
 
+import com.dinglicom.dealerdispathing.domain.DealerDispatchOnedayResp;
+import com.dinglicom.dealerdispathing.domain.DealerDispatchResp;
+import com.dinglicom.dealerdispathing.domain.DealerDispathReq;
+import com.dinglicom.dealerdispathing.domain.DealerOnedayTaskReq;
+import com.dinglicom.frame.sys.entity.UserInfo;
+
 /**
  *
  * @author panzhen
@@ -24,4 +30,32 @@ public interface DealerDispatchServcie {
     final static String DISPATH_STATE_NONE = "none";//未出货
     final static String DISPATH_STATE_INT = "ing";//未配送
     final static String DISPATH_STATE_DONE = "done";//已配送
+    /**
+     * 管理端获取经销商配送列表
+     * @param req
+     * @return 
+     */
+    DealerDispatchResp queryReportlist(DealerDispathReq req);
+    
+    /**
+     * 出货接口
+     * @param id 
+     * @param darler 
+     */
+    void doShip(String id, UserInfo darler);
+    
+    /**
+     * 经销商今日任务接口
+     * @param req
+     * @param darler
+     * @return 
+     */
+    DealerDispatchOnedayResp getCurDayTasks(DealerOnedayTaskReq req, UserInfo darler);
+    
+    /**
+     * 完成配送
+     * @param id
+     * @param darler 
+     */
+    void doDispatching(String id, UserInfo darler);
 }

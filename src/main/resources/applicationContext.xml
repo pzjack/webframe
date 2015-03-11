@@ -131,6 +131,7 @@
                 <ref bean="cronTriggerDispatch" />
                 <ref bean="cronTriggerReport" />
                 <ref bean="cronTriggerAutoReport" />
+                <ref bean="cronTriggerAutDealer" />
             </list>
         </property>
         <!-- Quartz配置, 本地运行无需单独的quartz.properties文件，在此简单配置即可 -->
@@ -146,17 +147,22 @@
     <!-- Cron式Trigger按照奶站生成配送单定义 -->
     <bean id="cronTriggerDispatch" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobDispatch" />
-        <property name="cronExpression" value="0 20 0 * * ?" />
+        <property name="cronExpression" value="0 28 0 * * ?" />
     </bean>
     <!-- Cron式Trigger按照单位计算报量定义 -->
     <bean id="cronTriggerReport" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobReport" />
-        <property name="cronExpression" value="0 52 18 * * ?" />
+        <property name="cronExpression" value="0 29 0 * * ?" />
     </bean>
     <!-- Cron式Trigger自动报量 -->
     <bean id="cronTriggerAutoReport" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="cronJobAutoReport" />
-        <property name="cronExpression" value="0 53 18 * * ?" />
+        <property name="cronExpression" value="0 30 0 * * ?" />
+    </bean>
+    <!-- Cron经销商数据生成 -->
+    <bean id="cronTriggerAutDealer" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="cronJobAutoDealer" />
+        <property name="cronExpression" value="0 31 0 * * ?" />
     </bean>
 
     <!-- JobDetajil, 基于MethodInvokingJobDetailFactoryBean调用普通Spring Bean -->
@@ -170,14 +176,18 @@
     <bean id="cronJobReport" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="everyDayEveryOrgReportServiceImpl" />
         <property name="targetMethod" value="doCreateReportnumberNextday" />
-        <!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
         <property name="concurrent" value="true" />
     </bean>
     
     <bean id="cronJobAutoReport" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="reportSubscribeNumberServiceImpl" />
         <property name="targetMethod" value="autoReportNumber" />
-        <!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
+        <property name="concurrent" value="true" />
+    </bean>
+    
+    <bean id="cronJobAutoDealer" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="dealerDispatchServcieImpl" />
+        <property name="targetMethod" value="autoGettoDealerProduct" />
         <property name="concurrent" value="true" />
     </bean>
     <!-- 

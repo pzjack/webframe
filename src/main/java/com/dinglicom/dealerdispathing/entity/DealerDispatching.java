@@ -23,7 +23,6 @@ import com.dinglicom.product.entity.UserProduct;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,7 +37,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @author panzhen
  */
 @Entity
-@Table(name = "dealer_dispatch")
+@Table(name = "dealer_dispatch_record")
 public class DealerDispatching  extends EntityExt implements Serializable {
     private SysOranizagion dealer;
     private String dealername;
@@ -50,6 +49,7 @@ public class DealerDispatching  extends EntityExt implements Serializable {
     private Long productnum;
     private UserInfo user;
     private String username;
+    private String dispatingno;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dispathingdate;
@@ -221,5 +221,20 @@ public class DealerDispatching  extends EntityExt implements Serializable {
      */
     public void setDispathingdate(Date dispathingdate) {
         this.dispathingdate = dispathingdate;
+    }
+
+    /**
+     * @return the dispatingno
+     */
+    @Column(name = "dispating_no")
+    public String getDispatingno() {
+        return dispatingno;
+    }
+
+    /**
+     * @param dispatingno the dispatingno to set
+     */
+    public void setDispatingno(String dispatingno) {
+        this.dispatingno = dispatingno;
     }
 }

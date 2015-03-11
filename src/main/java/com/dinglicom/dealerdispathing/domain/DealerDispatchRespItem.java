@@ -23,8 +23,8 @@ import java.util.List;
  *
  * @author panzhen
  */
-public class DealerDispatchItem {
-    private Long id;
+public class DealerDispatchRespItem {
+    private String id;
     private String dealer;
     private String manager;
     private Long total_amount;
@@ -33,14 +33,14 @@ public class DealerDispatchItem {
     /**
      * @return the id
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -17,6 +17,7 @@ public class DateUtil {
     private static SimpleDateFormat formatday = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat formatmin = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private static SimpleDateFormat formatsec = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat formatdaynum = new SimpleDateFormat("yyyyMMdd");
     /**
      * 获取下一个月第一天
      *
@@ -443,6 +444,14 @@ public class DateUtil {
     
     public static String formatToDay(Date d) {
         return formatday.format(d);
+    }
+    
+    public static String formatToDayNum(Date d) {
+        return formatdaynum.format(d);
+    }
+    
+    public static String formatToSec(Date d) {
+        return formatsec.format(d);
     }
 
     public static void main(String[] args) {

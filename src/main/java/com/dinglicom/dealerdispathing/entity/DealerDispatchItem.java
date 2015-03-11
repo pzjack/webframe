@@ -19,6 +19,7 @@ package com.dinglicom.dealerdispathing.entity;
 import com.dinglicom.frame.entity.EntityExt;
 import com.dinglicom.frame.sys.entity.SysOranizagion;
 import com.dinglicom.product.entity.UserProduct;
+import com.dinglicom.reportnum.entity.ReportSubscribeNumber;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
@@ -47,7 +48,8 @@ public class DealerDispatchItem  extends EntityExt implements Serializable {
     private String stationphone;
     private String stationaddress;
     
-    private DealerDispatching dealerDispatching;
+//    private DealerDispatching dealerDispatching;
+    private String dispatingno;
     private String dispathstate;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -57,6 +59,13 @@ public class DealerDispatchItem  extends EntityExt implements Serializable {
     private String productname;//产品名称
     private Integer producttype;//产品分类
     private Long distrutenum;//配送报量
+    
+    private Date shiptime;//出货时间
+    private long shipnum;//出货量
+    private String shipname;//出货人姓名
+    private String shipphone;//出货人联系电话
+    
+    private ReportSubscribeNumber reportdetail;
 
     /**
      * @return the dealer
@@ -180,21 +189,21 @@ public class DealerDispatchItem  extends EntityExt implements Serializable {
         this.stationaddress = stationaddress;
     }
 
-    /**
-     * @return the dealerDispatching
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dealer_dispatching_id")
-    public DealerDispatching getDealerDispatching() {
-        return dealerDispatching;
-    }
-
-    /**
-     * @param dealerDispatching the dealerDispatching to set
-     */
-    public void setDealerDispatching(DealerDispatching dealerDispatching) {
-        this.dealerDispatching = dealerDispatching;
-    }
+//    /**
+//     * @return the dealerDispatching
+//     */
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "dealer_dispatching_id")
+//    public DealerDispatching getDealerDispatching() {
+//        return dealerDispatching;
+//    }
+//
+//    /**
+//     * @param dealerDispatching the dealerDispatching to set
+//     */
+//    public void setDealerDispatching(DealerDispatching dealerDispatching) {
+//        this.dealerDispatching = dealerDispatching;
+//    }
 
     /**
      * @return the dispathstate
@@ -286,5 +295,97 @@ public class DealerDispatchItem  extends EntityExt implements Serializable {
      */
     public void setDistrutenum(Long distrutenum) {
         this.distrutenum = distrutenum;
+    }
+
+    /**
+     * @return the shiptime
+     */
+    @Column(name = "ship_time")
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    public Date getShiptime() {
+        return shiptime;
+    }
+
+    /**
+     * @param shiptime the shiptime to set
+     */
+    public void setShiptime(Date shiptime) {
+        this.shiptime = shiptime;
+    }
+
+    /**
+     * @return the shipnum
+     */
+    @Column(name = "ship_num")
+    public long getShipnum() {
+        return shipnum;
+    }
+
+    /**
+     * @param shipnum the shipnum to set
+     */
+    public void setShipnum(long shipnum) {
+        this.shipnum = shipnum;
+    }
+
+    /**
+     * @return the shipname
+     */
+    @Column(name = "ship_name")
+    public String getShipname() {
+        return shipname;
+    }
+
+    /**
+     * @param shipname the shipname to set
+     */
+    public void setShipname(String shipname) {
+        this.shipname = shipname;
+    }
+
+    /**
+     * @return the shipphone
+     */
+    @Column(name = "ship_phone")
+    public String getShipphone() {
+        return shipphone;
+    }
+
+    /**
+     * @param shipphone the shipphone to set
+     */
+    public void setShipphone(String shipphone) {
+        this.shipphone = shipphone;
+    }
+
+    /**
+     * @return the reportdetail
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "report_detail_id")
+    public ReportSubscribeNumber getReportdetail() {
+        return reportdetail;
+    }
+
+    /**
+     * @param reportdetail the reportdetail to set
+     */
+    public void setReportdetail(ReportSubscribeNumber reportdetail) {
+        this.reportdetail = reportdetail;
+    }
+
+    /**
+     * @return the dispatingno
+     */
+    @Column(name = "dispating_no")
+    public String getDispatingno() {
+        return dispatingno;
+    }
+
+    /**
+     * @param dispatingno the dispatingno to set
+     */
+    public void setDispatingno(String dispatingno) {
+        this.dispatingno = dispatingno;
     }
 }

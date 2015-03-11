@@ -646,7 +646,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (null != req.getSex() && !req.getSex().isEmpty()) {
             user.setSex(req.getSex());
         }
-        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {
+        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
             if (null != req.getManager()) {
                 user.setNickname(req.getManager());
                 SysOranizagion org = user.getOrg();
