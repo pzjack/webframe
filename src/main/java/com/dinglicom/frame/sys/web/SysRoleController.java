@@ -11,7 +11,6 @@ import com.dinglicom.frame.sys.service.PermissionService;
 import com.dinglicom.frame.sys.service.SysRoleService;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Resource;

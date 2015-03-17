@@ -139,4 +139,26 @@ public class DealerDispathController extends AppControllerBase {
         }
         return msg;
     }
+
+    @RequestMapping(value = "/detail")
+    public @ResponseBody
+    BaseMsgBean getTaskDetail(DealerOperatorTaskReq req) {
+        BaseMsgBean msg = new BaseMsgBean();
+        UserInfo dealer = validateToken(sysTokenService, msg, req.getUid(), req.getToken());
+        if (null == dealer || 0 >= req.getUid() || null == req.getId()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+            return msg;
+        }
+        try {
+            msg = dealerDispatchServcie.getDispatingDetail(req.getId());
+            msg.setResult("成功");
+        } catch (Exception e) {
+            LOG.warn("Dealer get task detail fail:", e);
+            msg.setCode(1);
+            msg.setResult("获取配送详情失败");
+            return msg;
+        }
+        return msg;
+    }
 }

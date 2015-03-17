@@ -122,9 +122,10 @@ public interface UserInfoService {
     /**
      * web管理界面获取所有用户信息列表，可能的查询条件用户角色
      * @param req
+     * @param user
      * @return 
      */
-    AdminAllUserInfoResp findAllUserPage(AdminGetAllUserReq req);
+    AdminAllUserInfoResp findAllUserPage(AdminGetAllUserReq req, UserInfo user);
     
     /**
      * 根据用户id信息获取用户详情消息

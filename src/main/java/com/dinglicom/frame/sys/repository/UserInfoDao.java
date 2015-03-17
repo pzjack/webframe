@@ -57,6 +57,30 @@ public interface UserInfoDao extends PagingAndSortingRepository<UserInfo, Long>,
     @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.signDelete = :signDelete")
     Page<UserInfoItem> findUserAndAccountStationPage(Pageable page, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
     
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.org.id, a.orgname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.userinfo.id=:salesmanId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserSalsmanPage(Pageable page, @Param(value = "salesmanId") Long salesmanId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.userinfo.id=:salesmanId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserSalsmanStationPage(Pageable page, @Param(value = "salesmanId") Long salesmanId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+    
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.org.id, a.orgname, a.did, a.dname) from UserInfo a where a.userType = :userRole and (a.org.parent.id=:depId or a.org.id=:depId) and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserDepPage(Pageable page, @Param(value = "depId") Long depId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.userType = :userRole and (a.org.parent.id=:depId or a.org.id=:depId) and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserDepStationPage(Pageable page, @Param(value = "depId") Long depId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+    
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.org.id, a.orgname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.dealer.id=:dealerId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserDarlerPage(Pageable page, @Param(value = "dealerId") Long dealerId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.dealer.id=:dealerId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserDarlerStationPage(Pageable page, @Param(value = "dealerId") Long dealerId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+    
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.org.id, a.orgname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.id=:stationId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserStationPage(Pageable page, @Param(value = "stationId") Long stationId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+
+    @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.userType = :userRole and a.org.id=:stationId and a.signDelete = :signDelete")
+    Page<UserInfoItem> findUserStationStationPage(Pageable page, @Param(value = "stationId") Long stationId, @Param(value = "userRole") String userRole, @Param(value = "signDelete") boolean signDelete);
+    
     @Query("select new com.dinglicom.frame.sys.domain.UserInfoItem(a.id, a.account, a.userType, a.sex, a.idNumber, a.realname, a.birthday, a.province.id, a.provincename, a.city.id, a.cityname,a.region.id, a.regionname, a.address, a.desc, a.phone, a.org.id, a.orgname, a.managerid, a.manager, a.nickname, a.did, a.dname) from UserInfo a where a.signDelete = :signDelete")
     Page<UserInfoItem> findUserAndAccountPage(Pageable page, @Param(value = "signDelete") boolean signDelete);
 

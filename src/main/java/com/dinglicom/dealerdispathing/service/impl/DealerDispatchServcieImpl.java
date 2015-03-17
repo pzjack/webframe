@@ -21,6 +21,8 @@ import com.dinglicom.dealerdispathing.domain.DealerDispatchResp;
 import com.dinglicom.dealerdispathing.domain.DealerDispatchRespItem;
 import com.dinglicom.dealerdispathing.domain.DealerDispathReq;
 import com.dinglicom.dealerdispathing.domain.DealerOnedayTaskReq;
+import com.dinglicom.dealerdispathing.domain.DispatingDetailResp;
+import com.dinglicom.dealerdispathing.domain.LineProduct;
 import com.dinglicom.dealerdispathing.entity.DealerDispatchItem;
 import com.dinglicom.dealerdispathing.entity.DealerDispatching;
 import com.dinglicom.dealerdispathing.repository.DealerDispatchItemDao;
@@ -85,7 +87,7 @@ public class DealerDispatchServcieImpl implements DealerDispatchServcie {
         Date cmin = DateUtil.getOneDayMintime(ct).getTime();
         Date cmax = DateUtil.getOneDayMaxtime(ct).getTime();
         String no = DateUtil.formatToDayNum(cur);
-        List<SysOranizagion> dls = sysOranizagionService.findAllDealer();//查找所有奶站
+        List<SysOranizagion> dls = sysOranizagionService.findAllDealer();//查找所有经销商
         for (SysOranizagion d : dls) {//逐个经销商处理一遍
             //首先判断该经销商是否已经处理过了
             if (dealerDispatchingDao.countDealerDataByDate(d.getId(), cmin, cmax) > 0) {
@@ -306,6 +308,38 @@ public class DealerDispatchServcieImpl implements DealerDispatchServcie {
             resp.setTotal_page(page.getTotalPages());
             resp.setData(page.getContent());
         }
+        return resp;
+    }
+
+    
+    @Override
+    @Transactional(readOnly = true)
+    public DispatingDetailResp getDispatingDetail(String id) {
+        DispatingDetailResp resp = new DispatingDetailResp();
+        List<DealerDispatchItem> list = dealerDispatchItemDao.findByDispatingno(id);
+        List<LineProduct> data = new ArrayList<LineProduct>();
+        Map<Long, LineProduct> map = new HashMap<Long, LineProduct>();
+        long num = 0;
+        for (DealerDispatchItem d : list) {
+            if (null == resp.getId()) {
+                resp.setId(d.getDispatingno());
+                resp.setStation(d.getStationname());
+                resp.setManager(d.getStationmanager());
+                resp.setTel(d.getStationphone());
+                resp.setAddress(d.getStationaddress());
+            }
+            LineProduct p = map.get(d.getProduct().getId());
+            if (null == p) {
+                p = new LineProduct();
+                map.put(d.getProduct().getId(), p);
+                data.add(p);
+                p.setProduct_name(d.getProductname());
+                p.setDistribution_num(d.getDistrutenum());
+            }
+            num += p.getDistribution_num();
+        }
+        resp.setTotal_amount(num);
+        resp.setData(data);
         return resp;
     }
 }

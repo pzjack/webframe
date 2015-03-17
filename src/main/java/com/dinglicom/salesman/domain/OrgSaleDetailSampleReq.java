@@ -12,6 +12,7 @@ package com.dinglicom.salesman.domain;
  */
 public class OrgSaleDetailSampleReq extends ProductSaleSampleReq {
     private Long user_id;
+    private String value;
 
     /**
      * @return the user_id
@@ -25,5 +26,19 @@ public class OrgSaleDetailSampleReq extends ProductSaleSampleReq {
      */
     public void setUser_id(Long user_id) {
         this.user_id = user_id;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -20,6 +20,7 @@ import com.dinglicom.dealerdispathing.domain.DealerDispatchOnedayResp;
 import com.dinglicom.dealerdispathing.domain.DealerDispatchResp;
 import com.dinglicom.dealerdispathing.domain.DealerDispathReq;
 import com.dinglicom.dealerdispathing.domain.DealerOnedayTaskReq;
+import com.dinglicom.dealerdispathing.domain.DispatingDetailResp;
 import com.dinglicom.frame.sys.entity.UserInfo;
 
 /**
@@ -58,4 +59,11 @@ public interface DealerDispatchServcie {
      * @param darler 
      */
     void doDispatching(String id, UserInfo darler);
+    
+    /**
+     * 配送详情
+     * @param id
+     * @return 
+     */
+    DispatingDetailResp getDispatingDetail(String id);
 }

@@ -73,7 +73,7 @@ public class SalesmanController extends AppControllerBase {
     BaseMsgBean querySaleByOrg(OrgSaleSampleReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo salesman = validateToken(sysTokenService, req, msg);
-        if (null == salesman || 0 >= req.getUid() || 0 >= req.getNum() || 0 >= req.getPage() || null == req.getType() || null == req.getRole()) {
+        if (null == salesman || 0 >= req.getUid() || 0 >= req.getNum() || 0 >= req.getPage() || null == req.getType()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
             return msg;

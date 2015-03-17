@@ -53,7 +53,7 @@ public class SaleSampleController extends AppControllerBase {
             return msg;
         }
         try {
-            msg = webSaleSampleService.queryByAllProductsample(req);
+            msg = webSaleSampleService.queryByAllProductsample(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Sample product sale count query fail.", e);
@@ -82,7 +82,7 @@ public class SaleSampleController extends AppControllerBase {
             return msg;
         }
         try {
-            msg = webSaleSampleService.queryByRolesample(req);
+            msg = webSaleSampleService.queryByRolesample(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Sample role sale count query fail.", e);

@@ -21,6 +21,7 @@ import com.dinglicom.salesman.domain.ProductSaleSampleReq;
 import com.dinglicom.salesman.domain.ProductSaleSampleResp;
 import com.dinglicom.salesman.domain.ProductSaleSampleRespItem;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.data.domain.Page;
@@ -74,23 +75,47 @@ public class SalesmanServiceImpl implements SalesmanService {
         Calendar c = Calendar.getInstance();
         PageRequest pagereq = buildPageRequest(req.getPage(), req.getNum());
         if (null == req.getType() || "month".equalsIgnoreCase(req.getType())) {
-            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), DateUtil.getYear(c), DateUtil.getMonth(c), Boolean.FALSE);
-            } else {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), DateUtil.getMonth(c), Boolean.FALSE);
+            int month = DateUtil.getMonth(c);
+            if(null != req.getValue()) {
+                month = Integer.valueOf(req.getValue());
             }
+//            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
+                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), DateUtil.getYear(c), month);
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), DateUtil.getMonth(c), Boolean.FALSE);
+//            }
         } else if ("quarter".equalsIgnoreCase(req.getType())) {
-            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByQuarter(pagereq, salesman.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c), Boolean.FALSE);
-            } else {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), DateUtil.getQuarter(c), Boolean.FALSE);
+            int quarter = DateUtil.getQuarter(c);
+            if(null != req.getValue()) {
+                quarter = Integer.valueOf(req.getValue());
             }
+//            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
+                page = everyDayEveryOrgReportDao.queryOrgSampleByQuarter(pagereq, salesman.getId(), DateUtil.getYear(c), quarter);
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryOrgSampleByMonth(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), DateUtil.getQuarter(c), Boolean.FALSE);
+//            }
+        } else if ("year".equalsIgnoreCase(req.getType())) {
+            int year = DateUtil.getYear(c);
+            if(null != req.getValue()) {
+                year = Integer.valueOf(req.getValue());
+            }
+//            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
+                page = everyDayEveryOrgReportDao.queryOrgSampleByYear(pagereq, salesman.getId(), year);
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryOrgSampleByYear(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), Boolean.FALSE);
+//            }
         } else {
-            if (null == req.getRole() || "ALL".equalsIgnoreCase(req.getRole())) {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByYear(pagereq, salesman.getId(), DateUtil.getYear(c), Boolean.FALSE);
-            } else {
-                page = everyDayEveryOrgReportDao.queryOrgSampleByYear(pagereq, salesman.getId(), req.getRole(), DateUtil.getYear(c), Boolean.FALSE);
+            int year = DateUtil.getYear(c);
+            int month = DateUtil.getMonth(c);
+            int day = DateUtil.getDay(c);
+            if(null != req.getValue()) {
+                Date dt = DateUtil.parserString2Date(req.getValue());
+                c.setTime(dt);
+                year = DateUtil.getYear(c);
+                month = DateUtil.getMonth(c);
+                day = DateUtil.getDay(c);
             }
+            page = everyDayEveryOrgReportDao.queryOrgSampleByDay(pagereq, salesman.getId(), year, month, day);
         }
         if (null != page && null != page.getContent()) {
             resp.setData(page.getContent());
@@ -106,14 +131,39 @@ public class SalesmanServiceImpl implements SalesmanService {
         Calendar c = Calendar.getInstance();
         Long saleCount;
         if (null == req.getType() || "month".equalsIgnoreCase(req.getType())) {
-            data = reportSubscribeNumberDao.queryOrgDetailsSampleByMonth(req.getUser_id(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByMonthNumber(req.getUser_id(), DateUtil.getYear(c), DateUtil.getMonth(c));
+            int month = DateUtil.getMonth(c);
+            if(null != req.getValue()) {
+                month = Integer.valueOf(req.getValue());
+            }
+            data = reportSubscribeNumberDao.queryOrgDetailsSampleByMonth(req.getUser_id(), DateUtil.getYear(c), month);
+            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByMonthNumber(req.getUser_id(), DateUtil.getYear(c), month);
         } else if ("quarter".equalsIgnoreCase(req.getType())) {
-            data = reportSubscribeNumberDao.queryOrgDetailsSampleByQuarter(req.getUser_id(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByQuarterNumber(req.getUser_id(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+            int quarter = DateUtil.getQuarter(c);
+            if(null != req.getValue()) {
+                quarter = Integer.valueOf(req.getValue());
+            }
+            data = reportSubscribeNumberDao.queryOrgDetailsSampleByQuarter(req.getUser_id(), DateUtil.getYear(c), quarter);
+            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByQuarterNumber(req.getUser_id(), DateUtil.getYear(c), quarter);
+        } else if ("year".equalsIgnoreCase(req.getType())) {
+            int year = DateUtil.getYear(c);
+            if(null != req.getValue()) {
+                year = Integer.valueOf(req.getValue());
+            }
+            data = reportSubscribeNumberDao.queryOrgDetailsSampleByYear(req.getUser_id(), year);
+            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByYearNumber(req.getUser_id(), year);
         } else {
-            data = reportSubscribeNumberDao.queryOrgDetailsSampleByYear(req.getUser_id(), DateUtil.getYear(c));
-            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByYearNumber(req.getUser_id(), DateUtil.getYear(c));
+            int year = DateUtil.getYear(c);
+            int month = DateUtil.getMonth(c);
+            int day = DateUtil.getDay(c);
+            if(null != req.getValue()) {
+                Date dt = DateUtil.parserString2Date(req.getValue());
+                c.setTime(dt);
+                year = DateUtil.getYear(c);
+                month = DateUtil.getMonth(c);
+                day = DateUtil.getDay(c);
+            }
+            data = reportSubscribeNumberDao.queryOrgDetailsSampleByDay(req.getUser_id(), year, month, day);
+            saleCount = reportSubscribeNumberDao.queryOrgDetailsSampleByDayNumber(req.getUser_id(), year, month, day);
         }
         if (null != data) {
             resp.setData(data);

@@ -518,7 +518,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 user.setOrg(nz);
                 user.setOrgname(nz.getName());
                 UserInfo nzmanager = findNaizhaiManager(nz);
-                if(null != nzmanager) {
+                if (null != nzmanager) {
                     user.setManagerid(nzmanager.getId());
                     user.setManager(nzmanager.getRealname());
                 }
@@ -571,9 +571,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             if (null != nz) {
                 user.setOrg(nz);
                 user.setOrgname(nz.getName());
-                
+
                 UserInfo nzmanager = findNaizhaiManager(nz);
-                if(null != nzmanager) {
+                if (null != nzmanager) {
                     user.setManagerid(nzmanager.getId());
                     user.setManager(nzmanager.getRealname());
                 }
@@ -622,6 +622,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setPhone(req.getTel());
         }
 
+        if (null != req.getRealname() && !req.getRealname().isEmpty()) {
+            user.setRealname(req.getRealname());
+        }
+
         if (null != req.getPid() && req.getPid() > 0) {
             SysOranizagion province = sysOranizagionService.read(req.getPid());
             if (null != province) {
@@ -646,27 +650,54 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (null != req.getSex() && !req.getSex().isEmpty()) {
             user.setSex(req.getSex());
         }
-        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
+        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(user.getUserType()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(user.getUserType())) {
             if (null != req.getManager()) {
                 user.setNickname(req.getManager());
                 SysOranizagion org = user.getOrg();
                 if (null != org) {
                     org.setResponsible_man(req.getManager());
-                    sysOranizagionService.save(org);
+                }
+            }
+
+            if (null != req.getRealname() && !req.getRealname().isEmpty()) {
+                if (null != user.getOrg()) {
+                    user.getOrg().setName(req.getRealname());
+                }
+            }
+            if (null != req.getDid() && req.getDid() > 0) {//仅奶站账号有次属性
+                SysOranizagion darlerOrg = sysOranizagionService.read(req.getDid());
+                if (null != darlerOrg) {
+                    if (null != user.getOrg()) {
+                        user.getOrg().setDealer(darlerOrg);
+                        user.getOrg().setDealer_name(darlerOrg.getName());
+                    }
+                } else {
+                    UserInfo darlerUser = read(req.getDid());
+                    if (null != darlerUser) {
+                        if (null != user.getOrg()) {
+                            user.getOrg().setDealer(darlerUser.getOrg());
+                            user.getOrg().setDealer_name(darlerUser.getRealname());
+                        }
+                        user.setDid(darlerUser.getId());
+                        user.setDname(darlerUser.getRealname());
+                    }
+                }
+            }
+            if (null != req.getSup_id() && req.getSup_id() > 0) {
+                UserInfo superman = read(req.getSup_id());
+                if (null != superman) {
+                    user.setManagerid(superman.getId());
+                    user.setManager(superman.getRealname());
                 }
             }
         }
-        if (null != req.getSup_id() && req.getSup_id() > 0) {
-            UserInfo superman = read(req.getSup_id());
-            if (null != superman) {
-                user.setManagerid(superman.getId());
-                user.setManager(superman.getRealname());
-            }
-        }
-        if (null != req.getRole() && !req.getRole().isEmpty()) {
-            user.setUserType(req.getRole());
-        }
+//        if (null != req.getRole() && !req.getRole().isEmpty()) {
+//            user.setUserType(req.getRole());
+//        }
         save(user);
+        if (null != user.getOrg()) {
+            sysOranizagionService.save(user.getOrg());
+        }
 
         if (null != req.getPwd() && !req.getPwd().isEmpty()) {
             SysUserAccount sysUserAccount = sysUserAccountService.findAccountByUserInfo(req.getUid());
@@ -688,16 +719,38 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     @Transactional(readOnly = true)
-    public AdminAllUserInfoResp findAllUserPage(AdminGetAllUserReq req) {
+    public AdminAllUserInfoResp findAllUserPage(AdminGetAllUserReq req, UserInfo user) {
         AdminAllUserInfoResp resp = new AdminAllUserInfoResp();
-        Page<UserInfoItem> page;
-        if (null == req.getRole()) {
-            page = userInfoDao.findUserAndAccountPage(new PageRequest(req.getPage() - 1, req.getNum()), Boolean.FALSE);
-        } else {
+        Page<UserInfoItem> page = null;
+        if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(user.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(user.getUserType())) {
             if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
                 page = userInfoDao.findUserAndAccountStationPage(new PageRequest(req.getPage() - 1, req.getNum()), req.getRole(), Boolean.FALSE);
             } else {
                 page = userInfoDao.findUserAndAccountPage(new PageRequest(req.getPage() - 1, req.getNum()), req.getRole(), Boolean.FALSE);
+            }
+        } else if (UserInfoService.USER_ROLE_MANAGER.equals(user.getUserType())) {
+            if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
+                page = userInfoDao.findUserDepStationPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
+            } else {
+                page = userInfoDao.findUserDepPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
+            }
+        } else if (UserInfoService.USER_ROLE_SALESMAN.equals(user.getUserType())) {
+            if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
+                page = userInfoDao.findUserSalsmanStationPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getId(), req.getRole(), Boolean.FALSE);
+            } else {
+                page = userInfoDao.findUserSalsmanPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getId(), req.getRole(), Boolean.FALSE);
+            }
+        } else if (UserInfoService.USER_ROLE_DEALER.equals(user.getUserType())) {
+            if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {
+                page = userInfoDao.findUserDarlerStationPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
+            } else {
+                page = userInfoDao.findUserDarlerPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
+            }
+        } else if (UserInfoService.USER_ROLE_STATION.equals(user.getUserType())) {
+            if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {
+                page = userInfoDao.findUserStationStationPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
+            } else {
+                page = userInfoDao.findUserStationPage(new PageRequest(req.getPage() - 1, req.getNum()), user.getOrg().getId(), req.getRole(), Boolean.FALSE);
             }
         }
         if (null != page) {

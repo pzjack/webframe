@@ -65,6 +65,11 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     Long queryProductSampleByYear(@Param(value = "salesid") long salesid, @Param(value = "year") int year, @Param(value = "signDelete") Boolean signDelete);
 
     //以下部分统计业务员接口中各个奶站或者经销商的销量情况
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.id =:orgid and a.year=:year and a.month=:month and a.day=:day group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryOrgDetailsSampleByDay(@Param(value = "orgid") long orgid, @Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "day") int day);
+
+    @Query("select sum(reportnum) from ReportSubscribeNumber a where a.org.id =:orgid and a.year=:year and a.month=:month and a.day=:day")
+    Long queryOrgDetailsSampleByDayNumber(@Param(value = "orgid") long orgid, @Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "day") int day);
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.id =:orgid and a.year=:year and a.month=:month group by a.product,a.productname")
     List<ProductSaleSampleRespItem> queryOrgDetailsSampleByMonth(@Param(value = "orgid") long orgid, @Param(value = "year") int year, @Param(value = "month") int month);
 
@@ -125,17 +130,53 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.month=:month group by a.product,a.productname order by rptnm desc")
     List<ProductSaleSampleRespItem> queryProductAllByMonth(@Param(value = "year") int year, @Param(value = "month") int month);
 
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.org.parent.id=:depId group by a.product,a.productname order by rptnm desc")
+    List<ProductSaleSampleRespItem> queryProductDepByMonth(@Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "depId") Long depId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.org.userinfo.id=:salesmanId group by a.product,a.productname order by rptnm desc")
+    List<ProductSaleSampleRespItem> queryProductSalesmanByMonth(@Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "salesmanId") Long salesmanId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.org.dealer.id=:dealerId group by a.product,a.productname order by rptnm desc")
+    List<ProductSaleSampleRespItem> queryProductDealerByMonth(@Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "dealerId") Long dealerId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.org.id=:stationId group by a.product,a.productname order by rptnm desc")
+    List<ProductSaleSampleRespItem> queryProductStationByMonth(@Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "stationId") Long stationId);
+
     @Query("select sum(reportnum) from ReportSubscribeNumber a where a.year=:year and a.month=:month")
     Long queryProductAllSampleByMonth(@Param(value = "year") int year, @Param(value = "month") int month);
 
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter group by a.product,a.productname")
     List<ProductSaleSampleRespItem> queryProducAllByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter);
 
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter and a.org.parent.id=:depId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProducDepByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter, @Param(value = "depId") Long depId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter and a.org.userinfo.id=:salesmanId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProducSalesmanByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter, @Param(value = "salesmanId") Long salesmanId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter and a.org.dealer.id=:dealerId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProducDealerByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter, @Param(value = "dealerId") Long dealerId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter and a.org.id=:stationId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProducStationByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter, @Param(value = "stationId") Long stationId);
+
     @Query("select sum(reportnum) from ReportSubscribeNumber a where a.year=:year and a.quarter=:quarter")
     Long queryProductAllSampleByQuater(@Param(value = "year") int year, @Param(value = "quarter") int quarter);
 
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year group by a.product,a.productname")
     List<ProductSaleSampleRespItem> queryProductAllByYear(@Param(value = "year") int year);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.org.parent.id=:depId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProductDepByYear(@Param(value = "year") int year, @Param(value = "depId") Long depId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.org.userinfo.id=:salesmanId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProductSalesmanByYear(@Param(value = "year") int year, @Param(value = "salesmanId") Long salesmanId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.org.dealer.id=:dealerId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProductDealerByYear(@Param(value = "year") int year, @Param(value = "dealerId") Long dealerId);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum) as rptnm) from ReportSubscribeNumber a where a.year=:year and a.org.id=:stationId group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryProductStationByYear(@Param(value = "year") int year, @Param(value = "stationId") Long stationId);
 
     @Query("select sum(reportnum) from ReportSubscribeNumber a where a.year=:year")
     Long queryProductAllSampleByYear(@Param(value = "year") int year);

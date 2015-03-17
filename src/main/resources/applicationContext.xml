@@ -87,7 +87,8 @@
     <!-- 用于设置JPA实现厂商的特定属性 -->
     <bean id="jpaVendorAdapter"
           class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="database" value="MYSQL" />
+        <property name="database" value="MYSQL" /> 
+        <!-- <property name="database" value="ORACLE" /> -->
     </bean>
     <!-- 用于指定一些高级特性 -->
     <bean id="jpaDialect"

@@ -5,9 +5,12 @@
  */
 package com.dinglicom.frame.sys.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -444,6 +447,14 @@ public class DateUtil {
     
     public static String formatToDay(Date d) {
         return formatday.format(d);
+    }
+    
+    public static Date parserString2Date(String datestr) {
+        try {
+            return formatday.parse(datestr);
+        } catch (ParseException ex) {
+        }
+        return new Date();
     }
     
     public static String formatToDayNum(Date d) {

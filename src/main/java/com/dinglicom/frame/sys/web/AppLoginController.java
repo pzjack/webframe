@@ -780,13 +780,15 @@ public class AppLoginController extends AppControllerBase {
     BaseMsgBean userinfopage(AdminGetAllUserReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        if (null == admin || 0 == req.getMid() || 0 >= req.getPage() || 0 >= req.getNum()) {
+        LOG.info("web user page(/webuserpage) parama,page:{}, pagenum:{},role:{}", req.getPage(), req.getNum(), req.getRole());
+        if (null == admin || 0 == req.getMid() || 0 >= req.getPage() || 0 >= req.getNum() || null == req.getRole()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
             return msg;
         }
+        LOG.info("web user page parama,userinfo,userid:{}, usertype:{}",admin.getId(), admin.getUserType());
         try {
-            msg = userInfoService.findAllUserPage(req);
+            msg = userInfoService.findAllUserPage(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             msg.setCode(1);
@@ -806,6 +808,7 @@ public class AppLoginController extends AppControllerBase {
     BaseMsgBean userinfoget(AdminUserInfoReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("web user details(/webuserget) get parama,uid:{}", req.getUid());
         if (null == admin || 0 == req.getMid() || 0 >= req.getUid()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");

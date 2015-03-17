@@ -12,6 +12,7 @@ package com.dinglicom.salesman.domain;
  */
 public class OrgSaleSampleReq extends ProductSaleSampleReq {
     private String role;
+    private String value;
 
     /**
      * @return the role
@@ -25,5 +26,19 @@ public class OrgSaleSampleReq extends ProductSaleSampleReq {
      */
     public void setRole(String role) {
         this.role = role;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }
