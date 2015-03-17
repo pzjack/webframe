@@ -79,6 +79,7 @@ public class DepServiceImpl implements DepService {
         SysOranizagion com = getCompany();
         if (null == com) {
             com = new SysOranizagion();
+            com.setType(SysOranizagionService.ORG_TYPE_COM);
 //            throw new RuntimeException("Company info is not exists.");
         }
         if (null != req.getCompany()) {

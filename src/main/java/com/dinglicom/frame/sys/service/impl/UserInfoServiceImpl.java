@@ -380,6 +380,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 dep.setResponsible_man(user.getRealname());
                 dep.setResponsible_phone(user.getPhone());
                 sysOranizagionService.save(dep);
+                user.setOrg(dep);
+                user.setOrgname(dep.getName());
 
                 if (null == user.getProvince()) {
                     user.setProvince(dep.getProvince());
@@ -407,6 +409,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 dep.setResponsible_man(user.getRealname());
                 dep.setResponsible_phone(user.getPhone());
                 sysOranizagionService.save(dep);
+                user.setOrg(dep);
+                user.setOrgname(dep.getName());
 
                 if (null == user.getProvince()) {
                     user.setProvince(dep.getProvince());
@@ -436,6 +440,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (null != salsman) {
                     user.setManagerid(salsman.getId());
                     user.setManager(salsman.getRealname());
+
+                    station.setParent(salsman.getOrg());
+                    user.setOrg(salsman.getOrg());
+                    user.setOrgname(salsman.getOrg().getName());
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
                 }
@@ -445,13 +453,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
             if (null != req.getDid() && req.getDid() > 0) {
-                SysOranizagion dealer = sysOranizagionService.read(req.getDid());
+                UserInfo dealer = read(req.getDid());
                 if (null != dealer) {
                     user.setDid(dealer.getId());
-                    user.setDname(dealer.getName());
+                    user.setDname(dealer.getRealname());
 
-                    station.setDealer(dealer);
-                    station.setDealer_name(dealer.getName());
+                    station.setDealer(dealer.getOrg());
+                    station.setDealer_name(dealer.getOrg().getName());
                 } else {
                     throw new RuntimeException("Not found dealer info by id:" + req.getDid());
                 }
@@ -484,6 +492,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (null != salsman) {
                     user.setManagerid(salsman.getId());
                     user.setManager(salsman.getRealname());
+
+                    dealer.setParent(salsman.getOrg());
+                    user.setOrg(salsman.getOrg());
+                    user.setOrgname(salsman.getOrg().getName());
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
                 }
@@ -665,29 +677,30 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
             if (null != req.getDid() && req.getDid() > 0) {//仅奶站账号有次属性
-                SysOranizagion darlerOrg = sysOranizagionService.read(req.getDid());
-                if (null != darlerOrg) {
+                UserInfo darlerUser = read(req.getDid());
+                if (null != darlerUser) {
                     if (null != user.getOrg()) {
-                        user.getOrg().setDealer(darlerOrg);
-                        user.getOrg().setDealer_name(darlerOrg.getName());
+                        user.getOrg().setDealer(darlerUser.getOrg());
+                        user.getOrg().setDealer_name(darlerUser.getRealname());
                     }
-                } else {
-                    UserInfo darlerUser = read(req.getDid());
-                    if (null != darlerUser) {
-                        if (null != user.getOrg()) {
-                            user.getOrg().setDealer(darlerUser.getOrg());
-                            user.getOrg().setDealer_name(darlerUser.getRealname());
-                        }
-                        user.setDid(darlerUser.getId());
-                        user.setDname(darlerUser.getRealname());
-                    }
+                    user.setDid(darlerUser.getId());
+                    user.setDname(darlerUser.getRealname());
                 }
             }
-            if (null != req.getSup_id() && req.getSup_id() > 0) {
-                UserInfo superman = read(req.getSup_id());
-                if (null != superman) {
-                    user.setManagerid(superman.getId());
-                    user.setManager(superman.getRealname());
+        }
+        if (null != req.getSup_id() && req.getSup_id() > 0) {
+            UserInfo superman = read(req.getSup_id());
+            if (null != superman) {
+                user.setManagerid(superman.getId());
+                user.setManager(superman.getRealname());
+
+                user.setOrg(superman.getOrg());
+                user.setOrgname(superman.getOrg().getName());
+            } else {
+                SysOranizagion supOrg = sysOranizagionService.read(req.getSup_id());
+                if (null != supOrg) {
+                    user.setOrg(supOrg);
+                    user.setOrgname(supOrg.getName());
                 }
             }
         }
