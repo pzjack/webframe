@@ -126,9 +126,10 @@ public interface UserOrderService {
     
     /**
      * web端订单统计
+     * @param user
      * @return 
      */
-    WebOrderCounterResp findWebOrdercounter();
+    WebOrderCounterResp findWebOrdercounter(UserInfo user);
     
     /**
      * web端获取订单详情
@@ -186,9 +187,10 @@ public interface UserOrderService {
     /**
      * web端分页查询所有订单信息
      * @param req
+     * @param user
      * @return 
      */
-    WebOrderitemAllResp findWebOrderitem(WebOrderitemReq req);
+    WebOrderitemAllResp findWebOrderitem(WebOrderitemReq req, UserInfo user);
     
     /**
      * web端查询订单

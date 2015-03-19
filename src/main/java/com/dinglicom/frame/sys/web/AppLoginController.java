@@ -629,6 +629,7 @@ public class AppLoginController extends AppControllerBase {
             msg.setResult("请输入位置区域编码");
             return msg;
         }
+        LOG.info("query station\tprivince:{}\tcity:{}\tregion:{}", req.getProvince(), req.getCity(), req.getRegion());
         try {
             WorkerOrgResp workstation = new WorkerOrgResp();
             workstation.setData(sysOranizagionService.findAllWorkerOrg(req));

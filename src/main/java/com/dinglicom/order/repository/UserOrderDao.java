@@ -39,6 +39,9 @@ public interface UserOrderDao extends PagingAndSortingRepository<UserOrder, Long
     @Query("select count(*) from UserOrder a where a.orderState = :orderState and a.signDelete = :signDelete")
     long getCountByOrderState(@Param(value = "orderState") String orderState, @Param(value = "signDelete") Boolean signDelete);
 
+    @Query("select count(*) from UserOrder a where a.org.id=:stationId and a.orderState = :orderState and a.signDelete = :signDelete")
+    long getCountByOrderState(@Param(value = "stationId") Long stationId, @Param(value = "orderState") String orderState, @Param(value = "signDelete") Boolean signDelete);
+
     @Query("select new com.dinglicom.order.domain.CustomerOrderItem(a.product.id, a.productsmallpic, a.productname, a.orderNo, a.userPay, a.orderState, a.distributionTarget, a.distributionType, a.distributionPeriod, a.distributionNum, a.productnum, a.completenum, a.productTotalPrice, a.firstDistributionDate, a.endDistributionDate,a.orderDesc, a.createDate)  from UserOrder a where a.user.id=:userId and a.orderState<:state and a.signDelete=:signDelete")
     List<CustomerOrderItem> findByCustomerByWorkerAndLessComplete(@Param(value = "userId") long userId, @Param(value = "state") String state, @Param(value = "signDelete") Boolean signDelete);
 
@@ -56,13 +59,21 @@ public interface UserOrderDao extends PagingAndSortingRepository<UserOrder, Long
 
     @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.signDelete = :signDelete")
     Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "signDelete") Boolean signDelete);
-    
+
+    @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.org.id=:stationId and a.signDelete = :signDelete")
+    Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "stationId") Long stationId, @Param(value = "signDelete") Boolean signDelete);
+
     @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.orderState = :orderState and a.signDelete = :signDelete order by a.id desc")
     Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "orderState") String orderState, @Param(value = "signDelete") Boolean signDelete);
-    
-    
+
+    @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.org.id=:stationId and a.orderState = :orderState and a.signDelete = :signDelete order by a.id desc")
+    Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "stationId") Long stationId, @Param(value = "orderState") String orderState, @Param(value = "signDelete") Boolean signDelete);
+
     @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.orderState in (:orderState1, :orderState2) and a.signDelete = :signDelete order by a.id desc")
     Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "orderState1") String orderState1, @Param(value = "orderState2") String orderState2, @Param(value = "signDelete") Boolean signDelete);
+
+    @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where a.org.id=:stationId and a.orderState in (:orderState1, :orderState2) and a.signDelete = :signDelete order by a.id desc")
+    Page<WebOrderItemResp> getAllOrderItem(Pageable page, @Param(value = "stationId") Long stationId, @Param(value = "orderState1") String orderState1, @Param(value = "orderState2") String orderState2, @Param(value = "signDelete") Boolean signDelete);
     
     @Query("select new com.dinglicom.order.domain.WebOrderItemResp(a.orderNo, a.createDate, a.productname, a.userProxy, a.orderOrigin, a.consigneename, a.consigneephone, a.productTotalPrice, a.confirmtime, a.pausetime, a.pausedays, a.canceltime, a.completetime, a.distributionTarget, a.firstDistributionDate, a.milkmanname) from UserOrder a where (a.orderNo like :query or a.consigneename like :query  or a.consigneephone like :query) and a.signDelete = :signDelete")
     List<WebOrderItemResp> queryAllOrderItem(@Param(value = "query") String query, @Param(value = "signDelete") Boolean signDelete);

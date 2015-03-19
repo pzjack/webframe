@@ -351,7 +351,7 @@ public class UserOrderController extends AppControllerBase {
             return msg;
         }
         try {
-            msg = userOrderService.findWebOrderitem(req);
+            msg = userOrderService.findWebOrderitem(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Web get all order items fail.", e);
@@ -468,7 +468,7 @@ public class UserOrderController extends AppControllerBase {
             return msg;
         }
         try {
-            msg = userOrderService.findWebOrdercounter();
+            msg = userOrderService.findWebOrdercounter(admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Order confirm fail.", e);

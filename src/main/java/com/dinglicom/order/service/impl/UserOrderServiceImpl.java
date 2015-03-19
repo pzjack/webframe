@@ -457,16 +457,26 @@ public class UserOrderServiceImpl implements UserOrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public WebOrderCounterResp findWebOrdercounter() {
+    public WebOrderCounterResp findWebOrdercounter(UserInfo user) {
         WebOrderCounterResp resp = new WebOrderCounterResp();
         WebOrderCounter counter = new WebOrderCounter();
         resp.setData(counter);
-        counter.setInit(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_SUBMIT, Boolean.FALSE));
-        counter.setConfirm(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_CONFIRM, Boolean.FALSE));
-        counter.setIng(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_DISPATCHING, Boolean.FALSE));
-        counter.setPause(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_PAUSE, Boolean.FALSE));
-        counter.setCancel(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_STOP, Boolean.FALSE));
-        counter.setDone(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_COMPLETE, Boolean.FALSE) + userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE));
+        if(UserInfoService.USER_ROLE_ADMINISTRATOR.equals(user.getUserType())) {
+            counter.setInit(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_SUBMIT, Boolean.FALSE));
+            counter.setConfirm(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_CONFIRM, Boolean.FALSE));
+            counter.setIng(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_DISPATCHING, Boolean.FALSE));
+            counter.setPause(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_PAUSE, Boolean.FALSE));
+            counter.setCancel(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_STOP, Boolean.FALSE));
+            counter.setDone(userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_COMPLETE, Boolean.FALSE) + userOrderDao.getCountByOrderState(UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE));
+        } else if(UserInfoService.USER_ROLE_STATION.equals(user.getUserType())) {
+            Long stationId = user.getOrg().getId();
+            counter.setInit(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_SUBMIT, Boolean.FALSE));
+            counter.setConfirm(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_CONFIRM, Boolean.FALSE));
+            counter.setIng(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_DISPATCHING, Boolean.FALSE));
+            counter.setPause(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_PAUSE, Boolean.FALSE));
+            counter.setCancel(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_STOP, Boolean.FALSE));
+            counter.setDone(userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_COMPLETE, Boolean.FALSE) + userOrderDao.getCountByOrderState(stationId, UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE));
+        }
         return resp;
     }
 
@@ -578,18 +588,31 @@ public class UserOrderServiceImpl implements UserOrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public WebOrderitemAllResp findWebOrderitem(WebOrderitemReq req) {
+    public WebOrderitemAllResp findWebOrderitem(WebOrderitemReq req, UserInfo user) {
         WebOrderitemAllResp resp = new WebOrderitemAllResp();
 
-        Page<WebOrderItemResp> page;
-        if (null != req.getStatus()) {
-            if (UserOrderService.ORDER_STATE_COMPLETE.equals(req.getStatus())) {
-                page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), req.getStatus(), UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE);
+        Page<WebOrderItemResp> page = null;
+        if(UserInfoService.USER_ROLE_ADMINISTRATOR.equalsIgnoreCase(user.getUserType())) {
+            if (null != req.getStatus()) {
+                if (UserOrderService.ORDER_STATE_COMPLETE.equals(req.getStatus())) {
+                    page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), req.getStatus(), UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE);
+                } else {
+                    page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), req.getStatus(), Boolean.FALSE);
+                }
             } else {
-                page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), req.getStatus(), Boolean.FALSE);
+                page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), Boolean.FALSE);
             }
-        } else {
-            page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), Boolean.FALSE);
+        } else if(UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(user.getUserType())) {
+            Long stationId = user.getOrg().getId();
+            if (null != req.getStatus()) {
+                if (UserOrderService.ORDER_STATE_COMPLETE.equals(req.getStatus())) {
+                    page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), stationId, req.getStatus(), UserOrderService.ORDER_STATE_TERMINAT, Boolean.FALSE);
+                } else {
+                    page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), stationId, req.getStatus(), Boolean.FALSE);
+                }
+            } else {
+                page = userOrderDao.getAllOrderItem(buildPageRequest(req.getPage(), req.getNum()), stationId, Boolean.FALSE);
+            }
         }
         if (null != page) {
             resp.setData(page.getContent());

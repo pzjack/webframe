@@ -435,21 +435,19 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setUserType(UserInfoService.USER_ROLE_STATION);
             user.setNickname(req.getManager());
             SysOranizagion station = new SysOranizagion();
+            station.setName(req.getRealname());
+
+            user.setOrg(station);
+            user.setOrgname(station.getName());
             if (null != req.getSup_id() && req.getSup_id() > 0) {
                 UserInfo salsman = read(req.getSup_id());
                 if (null != salsman) {
                     user.setManagerid(salsman.getId());
                     user.setManager(salsman.getRealname());
-
                     station.setParent(salsman.getOrg());
-                    user.setOrg(salsman.getOrg());
-                    user.setOrgname(salsman.getOrg().getName());
+                    station.setUserinfo(salsman);
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
-                }
-                station.setUserinfo(salsman);
-                if (null != salsman.getOrg()) {
-                    station.setParent(salsman.getOrg());
                 }
             }
             if (null != req.getDid() && req.getDid() > 0) {
@@ -460,12 +458,14 @@ public class UserInfoServiceImpl implements UserInfoService {
 
                     station.setDealer(dealer.getOrg());
                     station.setDealer_name(dealer.getOrg().getName());
+                    if(null == station.getParent()) {
+                        station.setParent(dealer.getOrg());
+                    }
                 } else {
                     throw new RuntimeException("Not found dealer info by id:" + req.getDid());
                 }
             }
 
-            station.setName(req.getRealname());
             station.setProvince(user.getProvince());
             station.setProvince_name(user.getProvincename());
             station.setCity(user.getCity());
@@ -486,24 +486,20 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setUserType(UserInfoService.USER_ROLE_DEALER);
             user.setNickname(req.getManager());
             SysOranizagion dealer = new SysOranizagion();
+            dealer.setName(req.getRealname());
+            user.setOrg(dealer);
+            user.setOrgname(dealer.getName());
             if (null != req.getSup_id() && req.getSup_id() > 0) {
                 UserInfo salsman = read(req.getSup_id());
                 dealer.setUserinfo(salsman);
                 if (null != salsman) {
                     user.setManagerid(salsman.getId());
                     user.setManager(salsman.getRealname());
-
                     dealer.setParent(salsman.getOrg());
-                    user.setOrg(salsman.getOrg());
-                    user.setOrgname(salsman.getOrg().getName());
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
                 }
-                if (null != salsman.getOrg()) {
-                    dealer.setParent(salsman.getOrg());
-                }
             }
-            dealer.setName(req.getRealname());
 
             dealer.setProvince(user.getProvince());
             dealer.setProvince_name(user.getProvincename());
@@ -676,6 +672,25 @@ public class UserInfoServiceImpl implements UserInfoService {
                     user.getOrg().setName(req.getRealname());
                 }
             }
+            SysOranizagion org = user.getOrg();
+            if (null != org) {
+                if (null != user.getProvince()) {
+                    org.setProvince(user.getProvince());
+                    org.setProvince_name(user.getProvincename());
+                }
+                if (null != user.getCity()) {
+                    org.setCity(user.getCity());
+                    org.setCity_name(user.getCityname());
+                }
+                if (null != user.getRegion()) {
+                    org.setRegion(user.getRegion());
+                    org.setRegion_name(user.getRegionname());
+                }
+
+                if (null != req.getAddress()) {
+                    org.setAddress(user.getAddress());
+                }
+            }
             if (null != req.getDid() && req.getDid() > 0) {//仅奶站账号有次属性
                 UserInfo darlerUser = read(req.getDid());
                 if (null != darlerUser) {
@@ -687,20 +702,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                     user.setDname(darlerUser.getRealname());
                 }
             }
-        }
-        if (null != req.getSup_id() && req.getSup_id() > 0) {
-            UserInfo superman = read(req.getSup_id());
-            if (null != superman) {
-                user.setManagerid(superman.getId());
-                user.setManager(superman.getRealname());
+            if (null != req.getSup_id() && req.getSup_id() > 0) {
+                UserInfo superman = read(req.getSup_id());
+                if (null != superman) {
+                    user.setManagerid(superman.getId());
+                    user.setManager(superman.getRealname());
 
-                user.setOrg(superman.getOrg());
-                user.setOrgname(superman.getOrg().getName());
-            } else {
-                SysOranizagion supOrg = sysOranizagionService.read(req.getSup_id());
-                if (null != supOrg) {
-                    user.setOrg(supOrg);
-                    user.setOrgname(supOrg.getName());
+                    user.setOrg(superman.getOrg());
+                    user.setOrgname(superman.getOrg().getName());
                 }
             }
         }
