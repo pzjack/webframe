@@ -9,6 +9,7 @@ package com.dinglicom.reportnum.service;
 import com.dinglicom.frame.sys.entity.SysOranizagion;
 import com.dinglicom.frame.sys.entity.UserInfo;
 import com.dinglicom.order.domain.WebQueryOrderitemReq;
+import com.dinglicom.reportnum.demain.LineDataTmp;
 import com.dinglicom.reportnum.demain.LineDistributionQuery;
 import com.dinglicom.reportnum.demain.LineResp;
 import com.dinglicom.reportnum.demain.WebEverydayorgListResp;

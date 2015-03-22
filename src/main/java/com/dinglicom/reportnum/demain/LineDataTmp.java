@@ -17,11 +17,21 @@ public class LineDataTmp {
     private String pname;
     private Integer ptype;
     private Long rpnum;
+    private String derlar;
     
     public LineDataTmp() {}
     public LineDataTmp(Long orgid, String orgname, Long pid, String pname, Integer ptype, Long rpnum) {
         this.orgid = orgid;
         this.orgname = orgname;
+        this.pid = pid;
+        this.pname = pname;
+        this.ptype = ptype;
+        this.rpnum = rpnum;
+    }
+    public LineDataTmp(Long orgid, String orgname, String dealer, Long pid, String pname, Integer ptype, Long rpnum) {
+        this.orgid = orgid;
+        this.orgname = orgname;
+        this.derlar = dealer;
         this.pid = pid;
         this.pname = pname;
         this.ptype = ptype;
@@ -110,5 +120,19 @@ public class LineDataTmp {
      */
     public void setRpnum(Long rpnum) {
         this.rpnum = rpnum;
+    }
+
+    /**
+     * @return the derlar
+     */
+    public String getDerlar() {
+        return derlar;
+    }
+
+    /**
+     * @param derlar the derlar to set
+     */
+    public void setDerlar(String derlar) {
+        this.derlar = derlar;
     }
 }

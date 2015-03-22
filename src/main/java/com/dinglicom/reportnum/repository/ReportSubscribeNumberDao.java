@@ -207,9 +207,13 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.product.id, a.product.shortDesc, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year group by a.year,a.org,a.product")
     Page<LineDataTmp> queryLinebyYear(Pageable page, @Param(value = "year") Integer year);
     
-    
+    //线路数据
     @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.org.name like :orgname and a.year=:year and a.month=:month and a.day=:day group by a.year,a.org,a.product")
     Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, @Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "orgname")String orgname);
     @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day group by a.year,a.org,a.product")
     Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, @Param(value = "year") Integer year,@Param(value = "month") Integer month, @Param(value = "day") Integer day);
+    
+    @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.org.dealer_name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day group by a.year,a.org,a.product")
+    List<LineDataTmp> queryLinebyYearmonthday(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day);
+    
 }

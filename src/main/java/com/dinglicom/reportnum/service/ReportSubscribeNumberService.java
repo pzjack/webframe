@@ -103,4 +103,15 @@ public interface ReportSubscribeNumberService {
      * @return 
      */
     List<ReportSubscribeNumber> findByDealerAndDate(Long dealerId, Integer year,Integer month, Integer day);
+    
+    
+    
+    /**
+     * 线下报量报表
+     * @param year
+     * @param month
+     * @param day
+     * @return 
+     */
+    List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day);
 }

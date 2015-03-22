@@ -365,27 +365,40 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<LineDataTmp> queryLinebyYear(Pageable page, Integer year, String orgname) {
         return reportSubscribeNumberDao.queryLinebyYear(page, year, orgname);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<LineDataTmp> queryLinebyYear(Pageable page, Integer year) {
         return reportSubscribeNumberDao.queryLinebyYear(page, year);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, Integer year, Integer month, Integer day, String orgname) {
         return reportSubscribeNumberDao.queryLinebyYearmonthday(page, year, month, day, orgname);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, Integer year, Integer month, Integer day) {
         return reportSubscribeNumberDao.queryLinebyYearmonthday(page, year, month, day);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReportSubscribeNumber> findByDealerAndDate(Long dealerId, Integer year, Integer month, Integer day) {
          return reportSubscribeNumberDao.findByDealerYearmonthday(dealerId, year, month, day);
+    }
+    
+    
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day) {
+        return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
     }
 }

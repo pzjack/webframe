@@ -687,7 +687,7 @@ public class AppLoginController extends AppControllerBase {
         AdminUseraddResp msg = new AdminUseraddResp();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
         LOG.info("Admin add user:role:{} name:{}", req.getRole(), req.getRealname());
-        if (null == admin || 0 >= req.getMid() || !UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || null == req.getAccount() || null == req.getPwd()) {
+        if (null == admin || 0 >= req.getMid() || null == req.getAccount() || null == req.getPwd()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
             return msg;
@@ -718,7 +718,7 @@ public class AppLoginController extends AppControllerBase {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
         LOG.info("Admin update userid:{} :role:{} name:{}", req.getUid(), req.getRole(), req.getRealname());
-        if (null == admin || 0 == req.getMid() || !UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || 0 >= req.getUid()) {
+        if (null == admin || 0 == req.getMid() || 0 >= req.getUid()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
             return msg;
