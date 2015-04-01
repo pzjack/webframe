@@ -8,6 +8,7 @@ package com.dinglicom.reportnum.service;
 
 import com.dinglicom.frame.sys.domain.BaseMsgBean;
 import com.dinglicom.frame.sys.entity.UserInfo;
+import com.dinglicom.reportform.domain.SalemanTmp;
 import com.dinglicom.reportnum.demain.LineDataTmp;
 import com.dinglicom.reportnum.demain.ReportNumberPostReq;
 import com.dinglicom.reportnum.demain.WebReportnumberDetailResp;
@@ -114,4 +115,13 @@ public interface ReportSubscribeNumberService {
      * @return 
      */
     List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day);
+    
+    /**
+     * 销售人员销量统计
+     * @param year
+     * @param month
+     * @param day
+     * @return 
+     */
+    List<SalemanTmp> querySalemanbyday(Integer year, Integer month, Integer day);
 }

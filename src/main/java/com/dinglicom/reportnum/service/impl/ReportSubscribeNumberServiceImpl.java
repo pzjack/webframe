@@ -16,6 +16,7 @@ import com.dinglicom.order.service.UserOrderService;
 import com.dinglicom.product.domain.ProductItem;
 import com.dinglicom.product.entity.UserProduct;
 import com.dinglicom.product.service.UserProductService;
+import com.dinglicom.reportform.domain.SalemanTmp;
 import com.dinglicom.reportnum.demain.AutoReportLastNum;
 import com.dinglicom.reportnum.demain.LineDataTmp;
 import com.dinglicom.reportnum.demain.ReportNumberItemResp;
@@ -400,5 +401,11 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     @Transactional(readOnly = true)
     public List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day) {
         return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SalemanTmp> querySalemanbyday(Integer year, Integer month, Integer day) {
+        return reportSubscribeNumberDao.querySalemansbyYearmonthday(year, month, day);
     }
 }

@@ -28,6 +28,10 @@ import com.dinglicom.reportform.domain.ProductTotalCount;
 import com.dinglicom.reportform.domain.ProductTypeTotal;
 import com.dinglicom.reportform.domain.ProductTypeTotalNoTotal;
 import com.dinglicom.reportform.domain.ReportformReq;
+import com.dinglicom.reportform.domain.SaleData;
+import com.dinglicom.reportform.domain.SaleStation;
+import com.dinglicom.reportform.domain.SalemanResp;
+import com.dinglicom.reportform.domain.SalemanTmp;
 import com.dinglicom.reportform.domain.StationData;
 import com.dinglicom.reportform.domain.StationProductType;
 import com.dinglicom.reportform.domain.StationResp;
@@ -384,5 +388,119 @@ public class ReportFormServiceImpl implements ReportFormService {
             t.getDetail().add(ptm);
         }
         return ptmap;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SalemanResp querySalemanlist(ReportformReq req) {
+        SalemanResp resp = new SalemanResp();
+        Calendar c = Calendar.getInstance();
+        int year = DateUtil.getYear(c);
+        int month = DateUtil.getMonth(c);
+        int day = DateUtil.getDay(c);
+        if (null != req.getDate()) {
+            int p = req.getDate().indexOf("-");
+            if (p > 0) {
+                month = Integer.valueOf(req.getDate().substring(0, p).trim());
+                day = Integer.valueOf(req.getDate().substring(p + 1).trim());
+            }
+        }
+        List<LineProductItem> products = getAllProduct();
+        resp.setProducts(products);
+
+        
+        Map<Long, ProductCount> ptotalmap = new HashMap<Long, ProductCount>();
+        List<ProductCount> ptotaldata = new ArrayList<ProductCount>();
+        initTotalSalemanData(products, ptotalmap);
+        ptotaldata.addAll(ptotalmap.values());
+        resp.setTotal(ptotaldata);
+        
+        List<SaleData> datalist = new ArrayList<SaleData>();
+        resp.setData(datalist);
+        Map<String,ProductCount> pmap = new HashMap<String,ProductCount>();
+        Map<Long,SaleData> smap = new HashMap<Long,SaleData>();
+        Map<String,SaleStation> stationmap = new HashMap<String,SaleStation>();
+        
+        List<SalemanTmp> tmpd = reportSubscribeNumberService.querySalemanbyday(year, month, day);
+        if (null != tmpd) {
+            for (SalemanTmp t : tmpd) {
+                String sk = t.getSalemanid() + "_" + t.getOrgid();
+                String pk = t.getSalemanid() + "_" + t.getOrgid() + "_" + t.getPid();
+                SaleData line = smap.get(t.getSalemanid());
+                if (null == line) {
+                    line = new SaleData();
+                    line.setSalesman(t.getSalemanname());
+                    
+                    List<SaleStation> detail = new ArrayList<SaleStation>();
+                    line.setDetail(detail);
+                    
+                    datalist.add(line);
+                    smap.put(t.getSalemanid(), line);
+                }
+                SaleStation stot = stationmap.get(sk);
+                if(null == stot) {
+                    stot = new SaleStation();
+                    stot.setStation(t.getOrgname());
+                    line.getDetail().add(stot);
+                    //Add All product
+                    stationmap.put(sk, stot);
+                    initSalemanData(products, sk, stot, pmap);
+                }
+                ProductCount pc = pmap.get(pk);
+                if (null != pc) {
+                    pc.setNum(t.getRpnum());
+                    ProductCount tpc = ptotalmap.get(t.getPid());
+                    if (null != tpc) {
+                        tpc.setNum(pc.getNum() + tpc.getNum());
+                    }
+                }
+            }
+        }
+        return resp;
+    }
+    
+    private List<LineProductItem> getAllProduct() {
+        List<LineProductItem> list = new  ArrayList<LineProductItem>();
+        List<UserProduct> allprd = userProductService.getAll();
+        for (UserProduct p : allprd) {
+            LineProductItem item = new LineProductItem();
+            item.setPid(p.getId());
+            item.setPname(p.getShortname());
+            list.add(item);
+        }
+        return list;
+    }
+    
+    
+    
+    private void initTotalSalemanData(List<LineProductItem> products,  Map<Long,ProductCount> ptotalmap) {
+        Iterator<LineProductItem> it = products.iterator();
+        while (it.hasNext()) {
+            LineProductItem pm = it.next();
+            ProductCount p = ptotalmap.get(pm.getPid());
+            if (p == null) {
+                p = new ProductCount();
+                p.setPid(pm.getPid());
+                ptotalmap.put(pm.getPid(), p);
+            }
+        }
+    }
+    
+    
+    private void initSalemanData(List<LineProductItem> src, String statinkey, SaleStation station, Map<String,ProductCount> pmap) {
+        List<ProductCount> cat = new ArrayList<ProductCount>();
+        Iterator<LineProductItem> it = src.iterator();
+        while (it.hasNext()) {
+            LineProductItem e = it.next();
+            String key = statinkey + "_" + e.getPid();
+            ProductCount pc = pmap.get(key);
+            if(null ==  pc) {
+                pc = new ProductCount();
+                pc.setPid(e.getPid());
+                pmap.put(key, pc);
+                cat.add(pc);
+            }
+        }
+        station.setProducts(cat);
     }
 }
