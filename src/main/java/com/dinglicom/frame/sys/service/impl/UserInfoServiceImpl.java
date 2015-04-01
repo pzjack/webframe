@@ -575,24 +575,26 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         } else if (UserInfoService.USER_ROLE_CUSTOMER.equalsIgnoreCase(req.getRole())) {
             user.setUserType(UserInfoService.USER_ROLE_CUSTOMER);
-            SysOranizagion nz = sysOranizagionService.read(req.getSup_id());
-            if (null != nz) {
-                user.setOrg(nz);
-                user.setOrgname(nz.getName());
+            if(null != req.getSup_id()) {
+                SysOranizagion nz = sysOranizagionService.read(req.getSup_id());
+                if (null != nz) {
+                    user.setOrg(nz);
+                    user.setOrgname(nz.getName());
 
-                UserInfo nzmanager = findNaizhaiManager(nz);
-                if (null != nzmanager) {
-                    user.setManagerid(nzmanager.getId());
-                    user.setManager(nzmanager.getRealname());
-                }
-            } else {
-                UserInfo nzmanager = read(req.getSup_id());
-                if (null != nzmanager && null != nzmanager.getOrg()) {
-                    user.setOrg(nzmanager.getOrg());
-                    user.setOrgname(nzmanager.getOrg().getName());
+                    UserInfo nzmanager = findNaizhaiManager(nz);
+                    if (null != nzmanager) {
+                        user.setManagerid(nzmanager.getId());
+                        user.setManager(nzmanager.getRealname());
+                    }
+                } else {
+                    UserInfo nzmanager = read(req.getSup_id());
+                    if (null != nzmanager && null != nzmanager.getOrg()) {
+                        user.setOrg(nzmanager.getOrg());
+                        user.setOrgname(nzmanager.getOrg().getName());
 
-                    user.setManagerid(nzmanager.getId());
-                    user.setManager(nzmanager.getRealname());
+                        user.setManagerid(nzmanager.getId());
+                        user.setManager(nzmanager.getRealname());
+                    }
                 }
             }
         }

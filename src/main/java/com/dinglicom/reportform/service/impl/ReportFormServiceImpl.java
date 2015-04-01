@@ -28,6 +28,9 @@ import com.dinglicom.reportform.domain.ProductTotalCount;
 import com.dinglicom.reportform.domain.ProductTypeTotal;
 import com.dinglicom.reportform.domain.ProductTypeTotalNoTotal;
 import com.dinglicom.reportform.domain.ReportformReq;
+import com.dinglicom.reportform.domain.StationData;
+import com.dinglicom.reportform.domain.StationProductType;
+import com.dinglicom.reportform.domain.StationResp;
 import com.dinglicom.reportform.service.ReportFormService;
 import com.dinglicom.reportnum.demain.LineDataTmp;
 import com.dinglicom.reportnum.demain.LineProductItem;
@@ -55,8 +58,6 @@ public class ReportFormServiceImpl implements ReportFormService {
 
     private final static Logger LOG = LoggerFactory.getLogger(ReportFormServiceImpl.class);
 
-//    @PersistenceContext
-//    private EntityManager entityManager;
     @Resource
     private ReportSubscribeNumberService reportSubscribeNumberService;
     @Resource
@@ -144,6 +145,128 @@ public class ReportFormServiceImpl implements ReportFormService {
         return resp;
     }
     
+    
+    @Override
+    @Transactional(readOnly = true)
+    public StationResp queryStationlist(ReportformReq req) {
+        StationResp resp = new StationResp();
+        Calendar c = Calendar.getInstance();
+        int year = DateUtil.getYear(c);
+        int month = DateUtil.getMonth(c);
+        int day = DateUtil.getDay(c);
+        if (null != req.getDate()) {
+            int p = req.getDate().indexOf("-");
+            if (p > 0) {
+                month = Integer.valueOf(req.getDate().substring(0, p).trim());
+                day = Integer.valueOf(req.getDate().substring(p + 1).trim());
+            }
+        }
+        Map<Integer, StationProductType> ptmap = getAllTypeProductForStation();
+        List<StationProductType> products = new ArrayList<StationProductType>();
+        products.addAll(ptmap.values());
+        resp.setProducts(products);
+
+        Map<Long, StationData> datamap = new HashMap<Long, StationData>();
+        List<StationData> datalist = new ArrayList<StationData>();
+        resp.setData(datalist);
+        
+        Map<String,LineProductCountNoTotal> typemap = new HashMap<String,LineProductCountNoTotal>();
+        Map<String,ProductCount> pmap = new HashMap<String,ProductCount>();
+
+        List<ProductTypeTotalNoTotal> typetotal = new ArrayList<ProductTypeTotalNoTotal>();
+        Map<Integer, ProductTypeTotalNoTotal> typetotalmap = new HashMap<Integer, ProductTypeTotalNoTotal>();
+        Map<String, ProductTotalCount> ptotalmap = new HashMap<String, ProductTotalCount>();
+        initTotalStationData(ptmap, typetotalmap, typetotal, ptotalmap);
+        resp.setTotal(typetotal);
+        resp.setTotal_num(0L);
+
+        List<LineDataTmp> tmpd = reportSubscribeNumberService.queryLinebyday(year, month, day);
+        if (null != tmpd) {
+            for (LineDataTmp t : tmpd) {
+                StationData station = datamap.get(t.getOrgid());
+                if (null == station) {
+                    station = new StationData();
+                    station.setTotal_num(0L);
+                    station.setStation(t.getOrgname());
+                    
+                    datalist.add(station);
+                    datamap.put(t.getOrgid(), station);
+                    initStationData(ptmap, station, t.getOrgid(), typemap, pmap);
+                }
+                ProductTypeTotalNoTotal tot = typetotalmap.get(t.getPtype());
+                if (null != tot) {
+                    String tk = t.getPtype() + "_" + t.getPid();
+                    ProductTotalCount pc = ptotalmap.get(tk);
+                    if (null != pc) {
+                        pc.setCnum(t.getRpnum() + pc.getCnum());
+                    }
+                }
+                String tk = t.getOrgid() + "_" + t.getPtype();
+                String tp = tk + "_" + t.getPid();
+                LineProductCountNoTotal ot = typemap.get(tk);
+                if (null != ot) {
+                    ProductCount pdc = pmap.get(tp);
+                    if(null == pdc) continue;
+                    pdc.setNum(t.getRpnum());
+                    station.setTotal_num(station.getTotal_num() + pdc.getNum());
+                    resp.setTotal_num(pdc.getNum() + resp.getTotal_num());
+                }
+            }
+        }
+        return resp;
+    }
+
+    private void initStationData(Map<Integer, StationProductType> src, StationData state, Long orgid, Map<String,LineProductCountNoTotal> typemap, Map<String,ProductCount> pmap) {
+        Iterator<Entry<Integer, StationProductType>> it = src.entrySet().iterator();
+        List<LineProductCountNoTotal> typelist = new ArrayList<LineProductCountNoTotal>();
+        while (it.hasNext()) {
+            Entry<Integer, StationProductType> e = it.next();
+            LineProductCountNoTotal pc = new LineProductCountNoTotal();
+            List<ProductCount> detail = new ArrayList<ProductCount>();
+            pc.setCid(e.getKey());
+            pc.setDetail(detail);
+            String tk = orgid + "_" + e.getKey();
+            typemap.put(tk, pc);
+            typelist.add(pc);
+            state.setCat(typelist);
+            if(null != e.getValue() && null != e.getValue().getDetail()) {
+                List<LineProductItem> list = e.getValue().getDetail();
+                for(LineProductItem item : list) {
+                    ProductCount pdc = new ProductCount();
+                    pdc.setPid(item.getPid());
+                    pdc.setNum(0L);
+                    detail.add(pdc);
+                    pmap.put(tk + "_" +  pdc.getPid(), pdc);
+                }
+            }
+        }
+    }
+    
+    
+    private void initTotalStationData(Map<Integer, StationProductType> src, Map<Integer, ProductTypeTotalNoTotal> typetotalmap, List<ProductTypeTotalNoTotal> typetotallist, Map<String,ProductTotalCount> ptotalmap) {
+        Iterator<Entry<Integer, StationProductType>> it = src.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<Integer, StationProductType> e = it.next();
+            ProductTypeTotalNoTotal p = new ProductTypeTotalNoTotal();
+            p.setCid(e.getKey());
+            typetotallist.add(p);
+            typetotalmap.put(e.getKey(), p);
+            
+            List<ProductTotalCount> detail = new ArrayList<ProductTotalCount>();
+            p.setDetail(detail);
+            if(null != e.getValue() && null != e.getValue().getDetail()) {
+                List<LineProductItem> list = e.getValue().getDetail();
+                for(LineProductItem item : list) {
+                    ProductTotalCount pdc = new ProductTotalCount();
+                    pdc.setCnum(0L);
+                    pdc.setPid(item.getPid());
+                    detail.add(pdc);
+                    ptotalmap.put(e.getKey() + "_" +  pdc.getPid(), pdc);
+                }
+            }
+        }
+    }
+    
     private void initTotalLineData(Map<Integer, LineProductType> src, Map typetotalmap, List<ProductTypeTotalNoTotal> typetotallist, Map<String,ProductTotalCount> ptotalmap) {
         Iterator<Entry<Integer, LineProductType>> it = src.entrySet().iterator();
         while (it.hasNext()) {
@@ -222,6 +345,34 @@ public class ReportFormServiceImpl implements ReportFormService {
                         t.setCid(p.getProducttype());
                         t.setCname("酸奶");
                         t.setNeed_total(false);
+                }
+                List<LineProductItem> detail = new ArrayList<LineProductItem>();
+                t.setDetail(detail);
+                ptmap.put(p.getProducttype(), t);
+            }
+            LineProductItem ptm = new LineProductItem();
+            ptm.setPid(p.getId());
+            ptm.setPname(p.getShortname());
+            t.getDetail().add(ptm);
+        }
+        return ptmap;
+    }
+
+    private Map<Integer, StationProductType> getAllTypeProductForStation() {
+        Map<Integer, StationProductType> ptmap = new HashMap<Integer, StationProductType>();
+        List<UserProduct> allprd = userProductService.getAll();
+        for (UserProduct p : allprd) {
+            StationProductType t = ptmap.get(p.getProducttype());
+            if (null == t) {
+                t = new StationProductType();
+                switch (p.getProducttype()) {
+                    case 1:
+                        t.setCid(p.getProducttype());
+                        t.setCname("瓶装奶");
+                        break;
+                    default:
+                        t.setCid(p.getProducttype());
+                        t.setCname("酸奶");
                 }
                 List<LineProductItem> detail = new ArrayList<LineProductItem>();
                 t.setDetail(detail);

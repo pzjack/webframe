@@ -686,7 +686,7 @@ public class AppLoginController extends AppControllerBase {
     AdminUseraddResp adminAddUserInfo(AdminUserInfoReq req) {
         AdminUseraddResp msg = new AdminUseraddResp();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Admin add user:role:{} name:{}", req.getRole(), req.getRealname());
+        LOG.info("Admin add user:role:{} name:{},sup_id:{}, sup_name:{}", req.getRole(), req.getRealname(), req.getSup_id(),req.getSup_name());
         if (null == admin || 0 >= req.getMid() || null == req.getAccount() || null == req.getPwd()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");

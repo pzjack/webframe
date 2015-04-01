@@ -72,4 +72,35 @@ public class ReportformController extends AppControllerBase {
         }
         return msg;
     }
+    
+    
+    /**
+     * 查询报量统计列表
+     *
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/station")
+    public @ResponseBody
+    BaseMsgBean queryStationReportform(ReportformReq req) {
+        BaseMsgBean msg = new BaseMsgBean();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Query Staion report form.parma:date={}", req.getDate());
+        if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+            return msg;
+        }
+
+        try {
+            msg = reportFormService.queryStationlist(req);
+            msg.setResult("成功");
+        } catch (Exception e) {
+            LOG.warn("Query Staion report form fail.", e);
+            msg.setCode(1);
+            msg.setResult("失败");
+            return msg;
+        }
+        return msg;
+    }
 }

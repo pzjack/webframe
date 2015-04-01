@@ -18,6 +18,7 @@ package com.dinglicom.reportform.service;
 
 import com.dinglicom.reportform.domain.LineResp;
 import com.dinglicom.reportform.domain.ReportformReq;
+import com.dinglicom.reportform.domain.StationResp;
 
 /**
  *
@@ -26,4 +27,7 @@ import com.dinglicom.reportform.domain.ReportformReq;
 public interface ReportFormService {
 
     LineResp queryLinelist(ReportformReq req);
+    
+    
+    StationResp queryStationlist(ReportformReq req);
 }
