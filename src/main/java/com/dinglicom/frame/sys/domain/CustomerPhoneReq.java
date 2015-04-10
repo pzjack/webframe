@@ -13,6 +13,7 @@ package com.dinglicom.frame.sys.domain;
 public class CustomerPhoneReq extends AppPageReqBase {
     private String query;
     private String role;
+    private Long salesman;
 
     /**
      * @return the query
@@ -40,5 +41,19 @@ public class CustomerPhoneReq extends AppPageReqBase {
      */
     public void setRole(String role) {
         this.role = role;
+    }
+
+    /**
+     * @return the salesman
+     */
+    public Long getSalesman() {
+        return salesman;
+    }
+
+    /**
+     * @param salesman the salesman to set
+     */
+    public void setSalesman(Long salesman) {
+        this.salesman = salesman;
     }
 }

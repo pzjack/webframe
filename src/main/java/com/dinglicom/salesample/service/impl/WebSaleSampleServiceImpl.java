@@ -365,11 +365,11 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
         Page<WebSaleSampleItem> page;
         if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
             if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+                page = everyDayEveryOrgReportDao.queryAllStationByStationMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
             } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+                page = everyDayEveryOrgReportDao.queryAllStationByStationQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
             } else {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+                page = everyDayEveryOrgReportDao.queryAllStationByStationYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
             }
             if (null != page && null != page.getContent() && page.getContent().size() > 0) {
                 processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);

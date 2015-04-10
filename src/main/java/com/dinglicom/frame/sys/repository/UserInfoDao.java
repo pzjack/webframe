@@ -28,6 +28,10 @@ public interface UserInfoDao extends PagingAndSortingRepository<UserInfo, Long>,
     @Query("select new com.dinglicom.frame.sys.domain.AppUserBeanBase(id, realname, phone) from UserInfo a where a.userType=:userType and (a.phone=:qrystr or a.realname=:qrystr) and a.signDelete=:signDelete")
     List<AppUserBeanBase> findWorkerQueryString(@Param(value = "userType") String userType, @Param(value = "qrystr") String qrystr, @Param(value = "signDelete") boolean signDelete);
 
+    
+    @Query("select new com.dinglicom.frame.sys.domain.AppUserBeanBase(id, realname, phone) from UserInfo a where a.userType=:userType and (a.phone=:qrystr or a.realname=:qrystr) and a.org.userinfo.id=:salesmanid and a.signDelete=:signDelete")
+    List<AppUserBeanBase> findWorkerQueryString(@Param(value = "userType") String userType, @Param(value = "qrystr") String qrystr, @Param(value = "salesmanid") Long salesmanid, @Param(value = "signDelete") boolean signDelete);
+    
     @Query("select new com.dinglicom.frame.sys.domain.AppUserBeanBase(id, realname, phone) from UserInfo a where a.id > :id and a.phone=:phone and a.signDelete=:signDelete")
     Page<AppUserBeanBase> findWorkerQueryPhone(Pageable page, @Param(value = "id") long id, @Param(value = "phone") String phone, @Param(value = "signDelete") boolean signDelete);
 

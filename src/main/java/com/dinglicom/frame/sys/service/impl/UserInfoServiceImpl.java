@@ -105,7 +105,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Transactional(readOnly = true)
     public AppUserInfoPage findByWorkerPhone(CustomerPhoneReq customerPhoneReq) {
         AppUserInfoPage p = new AppUserInfoPage();
-        p.setData(userInfoDao.findWorkerQueryString(customerPhoneReq.getRole(), customerPhoneReq.getQuery(), false));
+        if(UserInfoService.USER_ROLE_DEALER.equals(customerPhoneReq.getRole()) && null != customerPhoneReq.getSalesman() && customerPhoneReq.getSalesman() > 0)  {
+            p.setData(userInfoDao.findWorkerQueryString(customerPhoneReq.getRole(), customerPhoneReq.getQuery(), customerPhoneReq.getSalesman(), false));
+        } else {
+            p.setData(userInfoDao.findWorkerQueryString(customerPhoneReq.getRole(), customerPhoneReq.getQuery(), false));
+        }
         return p;
     }
 
@@ -281,7 +285,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfo addUserByAdmin(AdminUserInfoReq req) {
+    public UserInfo addUserByAdmin(AdminUserInfoReq req, UserInfo admin) {
         UserInfo user = new UserInfo();
         user.setAddress(req.getAddress());
         user.setBirthday(req.getBirthday());
@@ -406,9 +410,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setUserType(UserInfoService.USER_ROLE_SALESMAN);
             SysOranizagion dep = sysOranizagionService.read(req.getSup_id());
             if (null != dep) {
-                dep.setResponsible_man(user.getRealname());
-                dep.setResponsible_phone(user.getPhone());
-                sysOranizagionService.save(dep);
+//                dep.setResponsible_man(user.getRealname());
+//                dep.setResponsible_phone(user.getPhone());
+//                sysOranizagionService.save(dep);
                 user.setOrg(dep);
                 user.setOrgname(dep.getName());
 
@@ -449,6 +453,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
                 }
+            } else if(UserInfoService.USER_ROLE_SALESMAN.equals(admin.getUserType())) {
+                    user.setManagerid(admin.getId());
+                    user.setManager(admin.getRealname());
+                    station.setParent(admin.getOrg());
+                    station.setUserinfo(admin);
             }
             if (null != req.getDid() && req.getDid() > 0) {
                 UserInfo dealer = read(req.getDid());
@@ -499,6 +508,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                 } else {
                     throw new RuntimeException("Not found salesman info by id:" + req.getDid());
                 }
+            } else if(UserInfoService.USER_ROLE_SALESMAN.equals(admin.getUserType())) {
+                    user.setManagerid(admin.getId());
+                    user.setManager(admin.getRealname());
+                    dealer.setParent(admin.getOrg());
+                    dealer.setUserinfo(admin);
             }
 
             dealer.setProvince(user.getProvince());
@@ -596,6 +610,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                         user.setManager(nzmanager.getRealname());
                     }
                 }
+            } else if(UserInfoService.USER_ROLE_STATION.equals(admin.getUserType())){
+                        user.setOrg(admin.getOrg());
+                        user.setOrgname(admin.getOrg().getName());
+
+                        user.setManagerid(admin.getId());
+                        user.setManager(admin.getRealname());
             }
         }
         save(user);

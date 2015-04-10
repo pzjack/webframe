@@ -102,9 +102,10 @@ public interface UserInfoService {
     /**
      * 系统管理员添加用户
      * @param req 
+     * @param admin 
      * @return  
      */
-    UserInfo addUserByAdmin(AdminUserInfoReq req);
+    UserInfo addUserByAdmin(AdminUserInfoReq req, UserInfo admin);
     
     /**
      * 系统管理员修改用户信息

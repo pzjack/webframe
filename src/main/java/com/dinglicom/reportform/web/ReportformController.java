@@ -16,18 +16,27 @@
 
 package com.dinglicom.reportform.web;
 
+import com.dinglicom.export.view.ExcelLineExportView;
+import com.dinglicom.export.view.ExcelSalesmanExportView;
+import com.dinglicom.export.view.ExcelStationExportView;
 import com.dinglicom.frame.sys.domain.BaseMsgBean;
 import com.dinglicom.frame.sys.entity.UserInfo;
 import com.dinglicom.frame.sys.service.SysTokenService;
 import com.dinglicom.frame.web.AppControllerBase;
+import com.dinglicom.reportform.domain.LineResp;
 import com.dinglicom.reportform.domain.ReportformReq;
+import com.dinglicom.reportform.domain.SalemanResp;
+import com.dinglicom.reportform.domain.StationResp;
 import com.dinglicom.reportform.service.ReportFormService;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  *
@@ -73,6 +82,37 @@ public class ReportformController extends AppControllerBase {
         return msg;
     }
     
+    /**
+     * 报量列表获取
+     *
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/exportline")
+    public ModelAndView exportReportSamplelist(ReportformReq req) {
+        LineResp msg = new LineResp();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Query Line report form.parma:date={}", req.getDate());
+        if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+        } else {
+            try {
+                msg = reportFormService.queryLinelist(req);
+                msg.setResult("成功");
+            } catch (Exception e) {
+                LOG.warn("Query Line report form fail.", e);
+                msg.setCode(1);
+                msg.setResult("失败");
+            }
+        }
+        
+        Map model = new HashMap();
+        model.put("reportlist", msg);
+        model.put("reportdate", req.getDate());
+        return new ModelAndView(new ExcelLineExportView(), model);
+    }
+    
     
     /**
      * 查询报量统计列表
@@ -103,6 +143,37 @@ public class ReportformController extends AppControllerBase {
         }
         return msg;
     }
+    
+    /**
+     * 报量列表获取
+     *
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/exportstation")
+    public ModelAndView exportReportStation(ReportformReq req) {
+        StationResp msg = new StationResp();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Query Staion report form.parma:date={}", req.getDate());
+        if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+        } else {
+            try {
+                msg = reportFormService.queryStationlist(req);
+                msg.setResult("成功");
+            } catch (Exception e) {
+                LOG.warn("Query Staion report form fail.", e);
+                msg.setCode(1);
+                msg.setResult("失败");
+            }
+        }
+        
+        Map model = new HashMap();
+        model.put("reportlist", msg);
+        model.put("reportdate", req.getDate());
+        return new ModelAndView(new ExcelStationExportView(), model);
+    }
 
     /**
      * 查询报量统计列表
@@ -132,5 +203,35 @@ public class ReportformController extends AppControllerBase {
             return msg;
         }
         return msg;
+    }
+
+    /**
+     * 查询报量统计列表
+     *
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/exportsalesman")
+    public ModelAndView exportSalesmanReportform(ReportformReq req) {
+        SalemanResp msg = new SalemanResp();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Query salesman report form.parma:date={}", req.getDate());
+        if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+        } else {
+        try {
+            msg = reportFormService.querySalemanlist(req);
+            msg.setResult("成功");
+        } catch (Exception e) {
+            LOG.warn("Query salesman report form fail.", e);
+            msg.setCode(1);
+            msg.setResult("失败");
+        }
+        }
+        Map model = new HashMap();
+        model.put("reportlist", msg);
+        model.put("reportdate", req.getDate());
+        return new ModelAndView(new ExcelSalesmanExportView(), model);
     }
 }

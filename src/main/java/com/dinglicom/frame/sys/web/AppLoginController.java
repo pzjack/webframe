@@ -693,7 +693,7 @@ public class AppLoginController extends AppControllerBase {
             return msg;
         }
         try {
-            UserInfo user = userInfoService.addUserByAdmin(req);
+            UserInfo user = userInfoService.addUserByAdmin(req, admin);
             if (null != user) {
                 msg.setUid(user.getId());
             }

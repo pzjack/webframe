@@ -205,7 +205,7 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     }
 
     @Override
-    @Transactional(readOnly = true)
+//    @Transactional(readOnly = true)
     public BaseMsgBean caculateOnedayReportNumber(UserInfo nzmanager, Calendar c) {
         SysOranizagion nz = nzmanager.getOrg();
         if (null == nz) {
