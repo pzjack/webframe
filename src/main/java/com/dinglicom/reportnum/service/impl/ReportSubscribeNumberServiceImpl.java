@@ -402,10 +402,26 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     public List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day) {
         return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
     }
+    @Override
+    @Transactional(readOnly = true)
+    public List<LineDataTmp> queryLinebydayDepid(Integer year, Integer month, Integer day, Long depid) {
+        return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<LineDataTmp> queryLinebydaySalesId(Integer year, Integer month, Integer day, Long salsesid) {
+        return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
+    }
 
     @Override
     @Transactional(readOnly = true)
     public List<SalemanTmp> querySalemanbyday(Integer year, Integer month, Integer day) {
+        return reportSubscribeNumberDao.querySalemansbyYearmonthday(year, month, day);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SalemanTmp> querySalemanbydayDepid(Integer year, Integer month, Integer day, Long depid) {
         return reportSubscribeNumberDao.querySalemansbyYearmonthday(year, month, day);
     }
 }

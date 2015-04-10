@@ -560,36 +560,59 @@ public class UserInfoServiceImpl implements UserInfoService {
                     user.setAddress(nz.getAddress());
                 }
             } else {
-                UserInfo nzmanager = read(req.getSup_id());
-                if (null != nzmanager && null != nzmanager.getOrg()) {
-                    user.setOrg(nzmanager.getOrg());
-                    user.setOrgname(nzmanager.getOrg().getName());
+                if (null != req.getSup_id() && req.getSup_id() > 0) {
+                    UserInfo nzmanager = read(req.getSup_id());
+                    if (null != nzmanager && null != nzmanager.getOrg()) {
+                        user.setOrg(nzmanager.getOrg());
+                        user.setOrgname(nzmanager.getOrg().getName());
 
-                    user.setManagerid(nzmanager.getId());
-                    user.setManager(nzmanager.getRealname());
+                        user.setManagerid(nzmanager.getId());
+                        user.setManager(nzmanager.getRealname());
+
+                        if (null == user.getProvince()) {
+                            user.setProvince(nzmanager.getOrg().getProvince());
+                            user.setProvincename(nzmanager.getOrg().getProvince_name());
+                        }
+                        if (null == user.getCity()) {
+                            user.setCity(nzmanager.getOrg().getCity());
+                            user.setCityname(nzmanager.getOrg().getCity_name());
+                        }
+                        if (null == user.getRegion()) {
+                            user.setRegion(nzmanager.getOrg().getRegion());
+                            user.setRegionname(nzmanager.getOrg().getRegion_name());
+                        }
+                        if (null == user.getAddress()) {
+                            user.setAddress(nzmanager.getOrg().getAddress());
+                        }
+                    } else {
+                        throw new RuntimeException("Not found station info for sup_id:" + req.getSup_id() + " super_name:" + req.getSup_name());
+                    }
+                } else if (UserInfoService.USER_ROLE_STATION.equals(admin.getUserType())) {
+                    user.setManagerid(admin.getId());
+                    user.setManager(admin.getRealname());
+                    user.setOrg(admin.getOrg());
+                    user.setOrgname(admin.getOrg().getName());
 
                     if (null == user.getProvince()) {
-                        user.setProvince(nzmanager.getOrg().getProvince());
-                        user.setProvincename(nzmanager.getOrg().getProvince_name());
+                        user.setProvince(admin.getOrg().getProvince());
+                        user.setProvincename(admin.getOrg().getProvince_name());
                     }
                     if (null == user.getCity()) {
-                        user.setCity(nzmanager.getOrg().getCity());
-                        user.setCityname(nzmanager.getOrg().getCity_name());
+                        user.setCity(admin.getOrg().getCity());
+                        user.setCityname(admin.getOrg().getCity_name());
                     }
                     if (null == user.getRegion()) {
-                        user.setRegion(nzmanager.getOrg().getRegion());
-                        user.setRegionname(nzmanager.getOrg().getRegion_name());
+                        user.setRegion(admin.getOrg().getRegion());
+                        user.setRegionname(admin.getOrg().getRegion_name());
                     }
                     if (null == user.getAddress()) {
-                        user.setAddress(nzmanager.getOrg().getAddress());
+                        user.setAddress(admin.getOrg().getAddress());
                     }
-                } else {
-                    throw new RuntimeException("Not found station info for sup_id:" + req.getSup_id() + " super_name:" + req.getSup_name());
                 }
             }
         } else if (UserInfoService.USER_ROLE_CUSTOMER.equalsIgnoreCase(req.getRole())) {
             user.setUserType(UserInfoService.USER_ROLE_CUSTOMER);
-            if(null != req.getSup_id()) {
+            if(null != req.getSup_id() && req.getSup_id() > 0) {
                 SysOranizagion nz = sysOranizagionService.read(req.getSup_id());
                 if (null != nz) {
                     user.setOrg(nz);
@@ -601,14 +624,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                         user.setManager(nzmanager.getRealname());
                     }
                 } else {
-                    UserInfo nzmanager = read(req.getSup_id());
-                    if (null != nzmanager && null != nzmanager.getOrg()) {
-                        user.setOrg(nzmanager.getOrg());
-                        user.setOrgname(nzmanager.getOrg().getName());
-
-                        user.setManagerid(nzmanager.getId());
-                        user.setManager(nzmanager.getRealname());
-                    }
+                    throw new RuntimeException("Not found station info for sup_id:" + req.getSup_id() + " super_name:" + req.getSup_name());
                 }
             } else if(UserInfoService.USER_ROLE_STATION.equals(admin.getUserType())){
                         user.setOrg(admin.getOrg());

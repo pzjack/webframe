@@ -15,6 +15,8 @@
  */
 package com.dinglicom.reportform.service.impl;
 
+import com.dinglicom.frame.sys.entity.UserInfo;
+import com.dinglicom.frame.sys.service.UserInfoService;
 import com.dinglicom.frame.sys.util.DateUtil;
 import com.dinglicom.product.entity.UserProduct;
 import com.dinglicom.product.service.UserProductService;
@@ -69,7 +71,7 @@ public class ReportFormServiceImpl implements ReportFormService {
 
     @Override
     @Transactional(readOnly = true)
-    public LineResp queryLinelist(ReportformReq req) {
+    public LineResp queryLinelist(ReportformReq req, UserInfo admin) {
         LineResp resp = new LineResp();
         Calendar c = Calendar.getInstance();
         int year = DateUtil.getYear(c);
@@ -100,8 +102,17 @@ public class ReportFormServiceImpl implements ReportFormService {
         initTotalLineData(ptmap, typetotalmap, typetotal, ptotalmap);
         resp.setTotal(typetotal);
 
-        ProductTypeTotal tnot = new ProductTypeTotal();
-        List<LineDataTmp> tmpd = reportSubscribeNumberService.queryLinebyday(year, month, day);
+        List<LineDataTmp> tmpd = null;
+        switch(admin.getUserType()) {
+            case UserInfoService.USER_ROLE_MANAGER:
+                tmpd = reportSubscribeNumberService.queryLinebydayDepid(year, month, day, admin.getOrg().getId());
+                break;
+            case UserInfoService.USER_ROLE_SALESMAN:
+                tmpd = reportSubscribeNumberService.queryLinebydaySalesId(year, month, day, admin.getId());
+                break;
+            default:
+                tmpd = reportSubscribeNumberService.queryLinebyday(year, month, day);
+        }
         if (null != tmpd) {
             for (LineDataTmp t : tmpd) {
                 LineStationData line = datamap.get(t.getOrgid());
@@ -152,7 +163,7 @@ public class ReportFormServiceImpl implements ReportFormService {
     
     @Override
     @Transactional(readOnly = true)
-    public StationResp queryStationlist(ReportformReq req) {
+    public StationResp queryStationlist(ReportformReq req, UserInfo admin) {
         StationResp resp = new StationResp();
         Calendar c = Calendar.getInstance();
         int year = DateUtil.getYear(c);
@@ -184,7 +195,17 @@ public class ReportFormServiceImpl implements ReportFormService {
         resp.setTotal(typetotal);
         resp.setTotal_num(0L);
 
-        List<LineDataTmp> tmpd = reportSubscribeNumberService.queryLinebyday(year, month, day);
+        List<LineDataTmp> tmpd = null;
+        switch(admin.getUserType()) {
+            case UserInfoService.USER_ROLE_MANAGER:
+                tmpd = reportSubscribeNumberService.queryLinebydayDepid(year, month, day, admin.getOrg().getId());
+                break;
+            case UserInfoService.USER_ROLE_SALESMAN:
+                tmpd = reportSubscribeNumberService.queryLinebydaySalesId(year, month, day, admin.getId());
+                break;
+            default:
+                tmpd = reportSubscribeNumberService.queryLinebyday(year, month, day);
+        }
         if (null != tmpd) {
             for (LineDataTmp t : tmpd) {
                 StationData station = datamap.get(t.getOrgid());
@@ -392,7 +413,7 @@ public class ReportFormServiceImpl implements ReportFormService {
 
     @Override
     @Transactional(readOnly = true)
-    public SalemanResp querySalemanlist(ReportformReq req) {
+    public SalemanResp querySalemanlist(ReportformReq req, UserInfo admin) {
         SalemanResp resp = new SalemanResp();
         Calendar c = Calendar.getInstance();
         int year = DateUtil.getYear(c);
@@ -421,7 +442,14 @@ public class ReportFormServiceImpl implements ReportFormService {
         Map<Long,SaleData> smap = new HashMap<Long,SaleData>();
         Map<String,SaleStation> stationmap = new HashMap<String,SaleStation>();
         
-        List<SalemanTmp> tmpd = reportSubscribeNumberService.querySalemanbyday(year, month, day);
+        List<SalemanTmp> tmpd = null;
+        switch(admin.getUserType()) {
+            case UserInfoService.USER_ROLE_MANAGER:
+                tmpd = reportSubscribeNumberService.querySalemanbydayDepid(year, month, day, admin.getOrg().getId());
+                break;
+            default:
+                tmpd = reportSubscribeNumberService.querySalemanbyday(year, month, day);
+        }
         if (null != tmpd) {
             for (SalemanTmp t : tmpd) {
                 String sk = t.getSalemanid() + "_" + t.getOrgid();

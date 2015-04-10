@@ -71,7 +71,7 @@ public class ReportformController extends AppControllerBase {
         }
 
         try {
-            msg = reportFormService.queryLinelist(req);
+            msg = reportFormService.queryLinelist(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Query Line report form fail.", e);
@@ -98,7 +98,7 @@ public class ReportformController extends AppControllerBase {
             msg.setResult("未输入必须字段或者无有效权限");
         } else {
             try {
-                msg = reportFormService.queryLinelist(req);
+                msg = reportFormService.queryLinelist(req, admin);
                 msg.setResult("成功");
             } catch (Exception e) {
                 LOG.warn("Query Line report form fail.", e);
@@ -133,7 +133,7 @@ public class ReportformController extends AppControllerBase {
         }
 
         try {
-            msg = reportFormService.queryStationlist(req);
+            msg = reportFormService.queryStationlist(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Query Staion report form fail.", e);
@@ -160,7 +160,7 @@ public class ReportformController extends AppControllerBase {
             msg.setResult("未输入必须字段或者无有效权限");
         } else {
             try {
-                msg = reportFormService.queryStationlist(req);
+                msg = reportFormService.queryStationlist(req, admin);
                 msg.setResult("成功");
             } catch (Exception e) {
                 LOG.warn("Query Staion report form fail.", e);
@@ -194,7 +194,7 @@ public class ReportformController extends AppControllerBase {
         }
 
         try {
-            msg = reportFormService.querySalemanlist(req);
+            msg = reportFormService.querySalemanlist(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Query salesman report form fail.", e);
@@ -221,7 +221,7 @@ public class ReportformController extends AppControllerBase {
             msg.setResult("未输入必须字段或者无有效权限");
         } else {
         try {
-            msg = reportFormService.querySalemanlist(req);
+            msg = reportFormService.querySalemanlist(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Query salesman report form fail.", e);

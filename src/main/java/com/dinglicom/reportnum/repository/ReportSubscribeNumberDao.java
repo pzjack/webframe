@@ -214,9 +214,19 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day group by a.year,a.org,a.product")
     Page<LineDataTmp> queryLinebyYearmonthday(Pageable page, @Param(value = "year") Integer year,@Param(value = "month") Integer month, @Param(value = "day") Integer day);
     
-    @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.org.dealer_name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.type='STATION' group by a.year,a.org,a.product")
+    @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.org.dealer_name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day  group by a.year,a.org,a.product")
     List<LineDataTmp> queryLinebyYearmonthday(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day);
     
-    @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.type='STATION' group by a.year,a.org,a.org.userinfo,a.product")
+    @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.org.dealer_name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.id=:depid group by a.year,a.org,a.product")
+    List<LineDataTmp> queryLinebyYearmonthdaydepid(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "depid")Long depid);
+   
+    @Query("select new com.dinglicom.reportnum.demain.LineDataTmp(a.org.id, a.org.name, a.org.dealer_name, a.product.id, a.product.shortname, a.product.producttype, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.userinfo.id=:salsesid group by a.year,a.org,a.product")
+    List<LineDataTmp> queryLinebyYearmonthdaysalesid(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "salsesid")Long salsesid);
+   
+    @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day  group by a.year,a.org,a.org.userinfo,a.product")
     List<SalemanTmp> querySalemansbyYearmonthday(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day);
+
+    @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.id=:depid  group by a.year,a.org,a.org.userinfo,a.product")
+    List<SalemanTmp> querySalemansbyYearmonthdaydepid(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "depid")Long depid);
+
 }

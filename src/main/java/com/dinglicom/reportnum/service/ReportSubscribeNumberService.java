@@ -115,6 +115,24 @@ public interface ReportSubscribeNumberService {
      * @return 
      */
     List<LineDataTmp> queryLinebyday(Integer year, Integer month, Integer day);
+    /**
+     * 线下报量报表
+     * @param year
+     * @param month
+     * @param day
+     * @param depid
+     * @return 
+     */
+    List<LineDataTmp> queryLinebydayDepid(Integer year, Integer month, Integer day, Long depid);
+    /**
+     * 线下报量报表
+     * @param year
+     * @param month
+     * @param day
+     * @param salsesid
+     * @return 
+     */
+    List<LineDataTmp> queryLinebydaySalesId(Integer year, Integer month, Integer day, Long salsesid);
     
     /**
      * 销售人员销量统计
@@ -124,4 +142,13 @@ public interface ReportSubscribeNumberService {
      * @return 
      */
     List<SalemanTmp> querySalemanbyday(Integer year, Integer month, Integer day);
+    /**
+     * 销售人员销量统计
+     * @param year
+     * @param month
+     * @param day
+     * @param depid
+     * @return 
+     */
+    List<SalemanTmp> querySalemanbydayDepid(Integer year, Integer month, Integer day, Long depid);
 }

@@ -16,6 +16,7 @@
 
 package com.dinglicom.reportform.service;
 
+import com.dinglicom.frame.sys.entity.UserInfo;
 import com.dinglicom.reportform.domain.LineResp;
 import com.dinglicom.reportform.domain.ReportformReq;
 import com.dinglicom.reportform.domain.SalemanResp;
@@ -27,10 +28,29 @@ import com.dinglicom.reportform.domain.StationResp;
  */
 public interface ReportFormService {
 
-    LineResp queryLinelist(ReportformReq req);
+    /**
+     * 查询某一天的报量报表
+     * 输出中包含线路信息
+     * @param req
+     * @param admin
+     * @return 
+     */
+    LineResp queryLinelist(ReportformReq req, UserInfo admin);
     
+    /**
+     * 查询某一天的报量报表
+     * 不包含线路数量
+     * @param req
+     * @param admin
+     * @return 
+     */
+    StationResp queryStationlist(ReportformReq req, UserInfo admin);
     
-    StationResp queryStationlist(ReportformReq req);
-    
-    SalemanResp querySalemanlist(ReportformReq req);
+    /**
+     * 查询销售员销售情况
+     * @param req
+     * @param admin
+     * @return 
+     */
+    SalemanResp querySalemanlist(ReportformReq req, UserInfo admin);
 }
