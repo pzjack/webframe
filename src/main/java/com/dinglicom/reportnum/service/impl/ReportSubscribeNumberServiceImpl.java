@@ -422,6 +422,6 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     @Override
     @Transactional(readOnly = true)
     public List<SalemanTmp> querySalemanbydayDepid(Integer year, Integer month, Integer day, Long depid) {
-        return reportSubscribeNumberDao.querySalemansbyYearmonthday(year, month, day);
+        return reportSubscribeNumberDao.querySalemansbyYearmonthdaydepid(year, month, day, depid);
     }
 }

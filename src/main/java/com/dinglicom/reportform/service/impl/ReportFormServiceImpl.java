@@ -133,7 +133,7 @@ public class ReportFormServiceImpl implements ReportFormService {
                         ProductTotalCount pc = ptotalmap.get(tk);
                         if(null != pc) {
                             pc.setCnum(t.getRpnum() + pc.getCnum());
-                            p.setTotal_cnum(pc.getCnum());
+                            p.setTotal_cnum(p.getTotal_cnum() + t.getRpnum());
                         }
                     } else if(tot instanceof ProductTypeTotalNoTotal) {
                         String tk = t.getPtype() + "_" + t.getPid();
@@ -442,12 +442,15 @@ public class ReportFormServiceImpl implements ReportFormService {
         Map<Long,SaleData> smap = new HashMap<Long,SaleData>();
         Map<String,SaleStation> stationmap = new HashMap<String,SaleStation>();
         
+        LOG.info("Login user role[{}]", admin.getUserType());
         List<SalemanTmp> tmpd = null;
         switch(admin.getUserType()) {
             case UserInfoService.USER_ROLE_MANAGER:
+                LOG.info("User id({}) dep manager, query salesman data." );
                 tmpd = reportSubscribeNumberService.querySalemanbydayDepid(year, month, day, admin.getOrg().getId());
                 break;
             default:
+                LOG.info("User id({}) admin, query salesman data." );
                 tmpd = reportSubscribeNumberService.querySalemanbyday(year, month, day);
         }
         if (null != tmpd) {

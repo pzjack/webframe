@@ -381,9 +381,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setUserType(UserInfoService.USER_ROLE_MANAGER);
             SysOranizagion dep = sysOranizagionService.read(req.getSup_id());
             if (null != dep) {
-                dep.setResponsible_man(user.getRealname());
-                dep.setResponsible_phone(user.getPhone());
-                sysOranizagionService.save(dep);
+//                dep.setResponsible_man(user.getRealname());
+//                dep.setResponsible_phone(user.getPhone());
+//                sysOranizagionService.save(dep);
                 user.setOrg(dep);
                 user.setOrgname(dep.getName());
 
@@ -408,11 +408,30 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         } else if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {
             user.setUserType(UserInfoService.USER_ROLE_SALESMAN);
-            SysOranizagion dep = sysOranizagionService.read(req.getSup_id());
-            if (null != dep) {
-//                dep.setResponsible_man(user.getRealname());
-//                dep.setResponsible_phone(user.getPhone());
-//                sysOranizagionService.save(dep);
+            
+            if (null != req.getSup_id() && req.getSup_id() > 0) {
+                SysOranizagion dep = sysOranizagionService.read(req.getSup_id());
+                user.setOrg(dep);
+                user.setOrgname(dep.getName());
+
+                if (null == user.getProvince()) {
+                    user.setProvince(dep.getProvince());
+                    user.setProvincename(dep.getProvince_name());
+                }
+                if (null == user.getCity()) {
+                    user.setCity(dep.getCity());
+                    user.setCityname(dep.getCity_name());
+                }
+                if (null == user.getRegion()) {
+                    user.setRegion(dep.getRegion());
+                    user.setRegionname(dep.getRegion_name());
+                }
+
+                if (null == req.getAddress()) {
+                    user.setAddress(dep.getAddress());
+                }
+            } else if(UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
+                SysOranizagion dep = admin.getOrg();
                 user.setOrg(dep);
                 user.setOrgname(dep.getName());
 

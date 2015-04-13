@@ -104,7 +104,7 @@ public class SaleSampleController extends AppControllerBase {
     BaseMsgBean sampleRoleDetail(WebRoleuserProductReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Sample role sale detail mid({}),token({})", req.getMid(), req.getToken());
+        LOG.info("Sample role sale detail mid({}),token({}),uid({})", req.getMid(), req.getToken(), req.getUid());
         if (null == admin || 0 >= req.getMid() || null == req.getType() || 0 >= req.getUid()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");

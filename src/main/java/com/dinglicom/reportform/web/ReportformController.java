@@ -63,7 +63,7 @@ public class ReportformController extends AppControllerBase {
     BaseMsgBean queryLineReportform(ReportformReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Query Line report form.parma:date={}", req.getDate());
+        LOG.info("Query Line report form.parma:date={},mid={}", req.getDate(), req.getMid());
         if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
@@ -125,7 +125,7 @@ public class ReportformController extends AppControllerBase {
     BaseMsgBean queryStationReportform(ReportformReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Query Staion report form.parma:date={}", req.getDate());
+        LOG.info("Query Staion report form.parma:date={},mid={}", req.getDate(),req.getMid());
         if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
@@ -186,7 +186,7 @@ public class ReportformController extends AppControllerBase {
     BaseMsgBean querySalesmanReportform(ReportformReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Query salesman report form.parma:date={}", req.getDate());
+        LOG.info("Query salesman report form.parma:date={}, mid:={}", req.getDate(), req.getMid());
         if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");

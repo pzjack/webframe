@@ -89,6 +89,16 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     @Query("select sum(reportnum) from ReportSubscribeNumber a where a.org.id =:orgid and a.year=:year")
     Long queryOrgDetailsSampleByYearNumber(@Param(value = "orgid") long orgid, @Param(value = "year") int year);
 
+    //经销商销售详情
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.dealer.id =:dealerid and a.year=:year and a.quarter=:quarter group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryDealarDetailsSampleByQuarter(@Param(value = "dealerid") long dealerid, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.dealer.id =:dealerid and a.year=:year group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryDealarDetailsSampleByYear(@Param(value = "dealerid") long dealerid, @Param(value = "year") int year);
+    
+    @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.dealer.id =:dealerid and a.year=:year and a.month=:month group by a.product,a.productname")
+    List<ProductSaleSampleRespItem> queryDealarDetailsSampleByMonth(@Param(value = "dealerid") long dealerid, @Param(value = "year") int year, @Param(value = "month") int month);
+    
     //以下部分统计销售部门产品的销量情况
     @Query("select new com.dinglicom.salesman.domain.ProductSaleSampleRespItem(a.product.id, a.productname, sum(reportnum)) from ReportSubscribeNumber a where a.org.id in (select b.id from SysOranizagion b where b.userinfo.org.id=:depid and b.signDelete=:signDelete) and a.year=:year and a.month=:month group by a.product,a.productname")
     List<ProductSaleSampleRespItem> queryProductDepByMonth(@Param(value = "depid") long depid, @Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "signDelete") Boolean signDelete);
@@ -226,7 +236,7 @@ public interface ReportSubscribeNumberDao extends PagingAndSortingRepository<Rep
     @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day  group by a.year,a.org,a.org.userinfo,a.product")
     List<SalemanTmp> querySalemansbyYearmonthday(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day);
 
-    @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.id=:depid  group by a.year,a.org,a.org.userinfo,a.product")
+    @Query("select new com.dinglicom.reportform.domain.SalemanTmp(a.org.id, a.org.name, a.org.userinfo.id, a.org.userinfo.realname, a.product.id, a.product.shortname, sum(a.reportnum)) from ReportSubscribeNumber a where a.year=:year and a.month=:month and a.day=:day and a.org.parent.id=:depid  group by a.year,a.org,a.org.userinfo,a.product")
     List<SalemanTmp> querySalemansbyYearmonthdaydepid(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "depid")Long depid);
 
 }
