@@ -95,7 +95,7 @@ public interface UserInfoDao extends PagingAndSortingRepository<UserInfo, Long>,
     List<WebSaleSampleItem> findUserByOrgAndType(@Param(value = "orgs") List<Long> orgs, @Param(value = "userType") String userType, @Param(value = "signDelete") boolean signDelete);
     
     
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, a.id, realname, phone) from UserInfo a where a.org.id in :orgs and a.userType=:userType and a.signDelete = :signDelete")
+    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, a.id, realname, phone) from UserInfo a where a.userType=:userType and a.signDelete = :signDelete")
     List<WebSaleSampleItem> findUserType(@Param(value = "userType") String userType, @Param(value = "signDelete") boolean signDelete);
     
     

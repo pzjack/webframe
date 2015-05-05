@@ -15,6 +15,7 @@ import com.dinglicom.salesman.domain.OrgSaleSampleRespItem;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -117,32 +118,32 @@ public interface EveryDayEveryOrgReportDao extends PagingAndSortingRepository<Ev
     List<DepsaleRespItem> querySaleManagerSampleByYear(@Param(value = "year") int year);
 
     //跨部门统计所有销售人员销售情况
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByAdminYear(Pageable page, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllSalemanBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByAdminYear(Pageable page, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllSalemanBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
 
     
 //    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesmanId and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone order by sum(totalnum) desc")
@@ -155,50 +156,50 @@ public interface EveryDayEveryOrgReportDao extends PagingAndSortingRepository<Ev
 //    Page<WebSaleSampleItem> queryAllSalemanByYear(Pageable page, @Param(value = "salesmanId")Long salesmanId, @Param(value = "year") int year);
 
     //跨部门统计所有奶站销售情况
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByAdminYear(Pageable page, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDarlerMonth(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDarlerQuater(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByDarlerYear(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByStationMonth(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByStationQuater(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllStationByStationYear(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByAdminYear(Pageable page, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDarlerMonth(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDarlerQuater(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByDarlerYear(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByStationMonth(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and  a.year=:year and a.quarter=:quarter group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByStationQuater(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id=:stationId and  a.year=:year group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllStationByStationYear(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year);
 
 //    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.id:=stationId and a.year=:year and a.month=:month group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone  order by sum(totalnum) desc")
 //    Page<WebSaleSampleItem> queryAllStationByMonth(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year, @Param(value = "month") int month);
@@ -210,103 +211,103 @@ public interface EveryDayEveryOrgReportDao extends PagingAndSortingRepository<Ev
 //    Page<WebSaleSampleItem> queryAllStationByYear(Pageable page, @Param(value = "stationId")Long stationId, @Param(value = "year") int year);
 
     //跨部门统计所有经销商销售情况
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByAdminYear(Pageable page, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDarlerMonth(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDarlerQuater(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDarlerByDarlerYear(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByAdminYear(Pageable page, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerBySalesmanMonth(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerBySalesmanQuater(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.userinfo.id=:salesId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerBySalesmanYear(Pageable page, @Param(value = "salesId")Long salesId, @Param(value = "year") int year);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and a.year=:year and a.month=:month group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDarlerMonth(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year and a.quarter=:quarter group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDarlerQuater(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone) from EveryDayEveryOrgReport a where a.org.dealer.id=:darlerId and  a.year=:year group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone  order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDarlerByDarlerYear(Pageable page, @Param(value = "darlerId")Long darlerId, @Param(value = "year") int year);
 
     //以下部分统计所有销售部门各自的销售业绩
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByAdminYear(Pageable page, @Param(value = "year") int year);
-    
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
-    Page<WebSaleSampleItem> queryAllDepByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.year=:year group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByAdminYear(Pageable page, @Param(value = "year") int year);
+//    
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.month=:month group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByDepMonth(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year and a.quarter=:quarter group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByDepQuater(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone) from EveryDayEveryOrgReport a where a.org.parent.id=:depId and a.year=:year group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone order by sum(totalnum) desc")
+//    Page<WebSaleSampleItem> queryAllDepByDepYear(Pageable page, @Param(value = "depId")Long depId, @Param(value = "year") int year);
     
     //以下部分统计公司所有销售业绩
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month")
-    Page<WebSaleSampleItem> queryAllComByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter")
-    Page<WebSaleSampleItem> queryAllComByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year")
-    Page<WebSaleSampleItem> queryAllComByAdminYear(Pageable page, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.month=:month")
+//    Page<WebSaleSampleItem> queryAllComByAdminMonth(Pageable page, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year and a.quarter=:quarter")
+//    Page<WebSaleSampleItem> queryAllComByAdminQuater(Pageable page, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum)) from EveryDayEveryOrgReport a where a.year=:year")
+//    Page<WebSaleSampleItem> queryAllComByAdminYear(Pageable page, @Param(value = "year") int year);
     
     
     
     //跨部门查询根据名称 统计所有销售人员销售情况
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
-    Page<WebSaleSampleItem> queryFieldSalemanByMonth(Pageable page,  @Param(value = "name")String name, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
-    Page<WebSaleSampleItem> queryFieldSalemanByQuater(Pageable page, @Param(value = "name")String name, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
-    Page<WebSaleSampleItem> queryFieldSalemanByYear(Pageable page, @Param(value = "name")String name, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year and a.month=:month group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
+//    Page<WebSaleSampleItem> queryFieldSalemanByMonth(Pageable page,  @Param(value = "name")String name, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year and a.quarter=:quarter group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
+//    Page<WebSaleSampleItem> queryFieldSalemanByQuater(Pageable page, @Param(value = "name")String name, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo is not null and (a.org.userinfo.realname =:name or a.org.userinfo.phone=:name) and a.year=:year group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone")
+//    Page<WebSaleSampleItem> queryFieldSalemanByYear(Pageable page, @Param(value = "name")String name, @Param(value = "year") int year);
     
     
     //跨部门查询根据名称 统计所有奶站/经销商销售情况
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids and a.year=:year and a.month=:month group by a.org")
-    Page<WebSaleSampleItem> queryFieldStationByMonth(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids  and a.year=:year and a.quarter=:quarter group by a.org")
-    Page<WebSaleSampleItem> queryFieldStationByQuater(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids  and a.year=:year group by a.org")
-    Page<WebSaleSampleItem> queryFieldStationByYear(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids and a.year=:year and a.month=:month group by a.org")
+//    Page<WebSaleSampleItem> queryFieldStationByMonth(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids  and a.year=:year and a.quarter=:quarter group by a.org")
+//    Page<WebSaleSampleItem> queryFieldStationByQuater(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.id in :orgids  and a.year=:year group by a.org")
+//    Page<WebSaleSampleItem> queryFieldStationByYear(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year);
     
     
     
     //以下部分查询根据名称 统计所有销售部门各自的销售业绩
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year and a.month=:month group by a.org.userinfo.org")
-    Page<WebSaleSampleItem> queryFieldDepByMonth(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "month") int month);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year and a.quarter=:quarter group by a.org.userinfo.org")
-    Page<WebSaleSampleItem> queryFieldDepByQuater(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
-
-    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year group by a.org.userinfo.org")
-    Page<WebSaleSampleItem> queryFieldDepByYear(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year);
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year and a.month=:month group by a.org.userinfo.org")
+//    Page<WebSaleSampleItem> queryFieldDepByMonth(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "month") int month);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year and a.quarter=:quarter group by a.org.userinfo.org")
+//    Page<WebSaleSampleItem> queryFieldDepByQuater(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year, @Param(value = "quarter") int quarter);
+//
+//    @Query("select new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.org.id, sum(totalnum)) from EveryDayEveryOrgReport a where a.org.userinfo.org.id in :orgids and a.year=:year group by a.org.userinfo.org")
+//    Page<WebSaleSampleItem> queryFieldDepByYear(Pageable page, @Param(value = "orgids") List<Long> orgids, @Param(value = "year") int year);
 }

@@ -43,10 +43,10 @@ public interface WebSaleSampleService {
      */
     WebProductSaleResp queryByRoledetail(WebRoleuserProductReq req);
     
-    /**
-     * web管理端更加用户姓名和电话信息查询统计符合条件用户角色销售总量
-     * @param req
-     * @return 
-     */
-    WebSaleSampleQueryResp queryByQueryfieldsample(WebSaleSampleReq req);
+//    /**
+//     * web管理端更加用户姓名和电话信息查询统计符合条件用户角色销售总量
+//     * @param req
+//     * @return 
+//     */
+//    WebSaleSampleQueryResp queryByQueryfieldsample(WebSaleSampleReq req);
 }

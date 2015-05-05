@@ -56,26 +56,53 @@
         primary key (id)
      ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
    oracle:
-     CREATE TABLE dealer_dispatch (
-        id NUMBER(20) NOT NULL PRIMARY KEY,
-        dealer_id NUMBER(20) DEFAULT NULL,
-        dealer_name VARCHAR2(120) DEFAULT NULL,
-        dealer_manager VARCHAR2(60) DEFAULT NULL,
-        work_station_id NUMBER(20) DEFAULT NULL,
-        station_name VARCHAR2(120) DEFAULT NULL,
-        station_manager VARCHAR2(60) DEFAULT NULL,
-        station_phone VARCHAR2(30) DEFAULT NULL,
-        station_address VARCHAR2(300) DEFAULT NULL,
-        dealer_dispatching_id  NUMBER(20) DEFAULT NULL,
-        dispath_state VARCHAR2(20) DEFAULT NULL,
-        dispathing_date DATETIME DEFAULT NULL,
-        product_id NUMBER(20) DEFAULT NULL,
-        product_name VARCHAR2(60) DEFAULT NULL,
-        product_type NUMBER DEFAULT NULL,
-        distrute_num NUMBER DEFAULT 0,
-        sign_delete NUMBER(1) DEFAULT 0,
-        createdate TIMESTAMP
-     )
+     CREATE TABLE dealer_dispatch_item_detail (
+	  id NUMBER(20) NOT NULL,
+	  dealer_id NUMBER(20) DEFAULT NULL,
+	  dealer_name VARCHAR2(60) DEFAULT NULL,
+	  dealer_manager VARCHAR2(60) DEFAULT NULL,
+	  work_station_id NUMBER(20) DEFAULT NULL,
+	  station_name VARCHAR2(60) DEFAULT NULL,
+	  station_manager VARCHAR2(60) DEFAULT NULL,
+	  station_phone VARCHAR2(30) DEFAULT NULL,
+	  station_address VARCHAR2(300) DEFAULT NULL,
+	  dispath_state VARCHAR2(20) DEFAULT NULL,
+	  dispathing_date TIMESTAMP DEFAULT NULL,
+	  product_id NUMBER(20) DEFAULT NULL,
+	  product_name VARCHAR2(60) DEFAULT NULL,
+	  product_type NUMBER DEFAULT NULL,
+	  distrute_num NUMBER(20) DEFAULT NULL,
+	  ship_time TIMESTAMP DEFAULT NULL,
+	  ship_num NUMBER DEFAULT NULL,
+	  ship_name VARCHAR2(60) DEFAULT NULL,
+	  ship_phone VARCHAR2(30) DEFAULT NULL,
+	  dispating_no VARCHAR2(30) DEFAULT NULL,
+	  report_detail_id NUMBER(20) DEFAULT NULL,
+	  sign_delete NUMBER(1) DEFAULT NULL,
+	  createdate TIMESTAMP DEFAULT NULL,
+	  PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE dealer_dispatch_record (
+  id NUMBER(20) NOT NULL,
+  dealer_id NUMBER(20) DEFAULT NULL,
+  dealer_name VARCHAR2(60) DEFAULT NULL,
+  dealer_manager VARCHAR2(60) DEFAULT NULL,
+  dispath_state VARCHAR2(20) DEFAULT NULL,
+  product_id NUMBER(20) DEFAULT NULL,
+  product_name VARCHAR2(60) DEFAULT NULL,
+  product_type NUMBER DEFAULT NULL,
+  product_num NUMBER(20) DEFAULT NULL,
+  dispathing_date TIMESTAMP DEFAULT NULL,
+  user_id NUMBER(20) DEFAULT NULL,
+  user_name VARCHAR2(60) DEFAULT NULL,
+  dispating_no VARCHAR2(30) DEFAULT NULL,
+  sign_delete NUMBER(1) DEFAULT NULL,
+  createdate TIMESTAMP DEFAULT NULL,
+  PRIMARY KEY (id)
+);
 
 5.user_info表增加字段：
   mysql:dealer_id bigint,dealer_name varchar(120)

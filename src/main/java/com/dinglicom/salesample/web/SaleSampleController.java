@@ -105,7 +105,7 @@ public class SaleSampleController extends AppControllerBase {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
         LOG.info("Sample role sale detail mid({}),token({}),uid({})", req.getMid(), req.getToken(), req.getUid());
-        if (null == admin || 0 >= req.getMid() || null == req.getType() || 0 >= req.getUid()) {
+        if (null == admin || 0 >= req.getMid() || null == req.getType() || null == req.getUid() || 0 >= req.getUid()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
             return msg;
@@ -133,7 +133,7 @@ public class SaleSampleController extends AppControllerBase {
     BaseMsgBean sampleRoleQuery(WebSaleSampleReq req) {
         BaseMsgBean msg = new BaseMsgBean();
         UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
-        LOG.info("Sample role query field mid({}),token({})", req.getMid(), req.getToken());
+        LOG.info("Sample role query field mid({}),token({}), query({})", req.getMid(), req.getToken(), req.getQuery());
         if (null == admin || 0 >= req.getMid() || null == req.getType() || null == req.getQuery() || null == req.getRole()) {
             msg.setCode(1);
             msg.setResult("未输入必须字段或者无有效权限");
@@ -142,7 +142,8 @@ public class SaleSampleController extends AppControllerBase {
         try {
             req.setPage(1);
             req.setNum(20);
-            msg = webSaleSampleService.queryByQueryfieldsample(req);
+//            msg = webSaleSampleService.queryByQueryfieldsample(req);
+             msg = webSaleSampleService.queryByRolesample(req, admin);
             msg.setResult("成功");
         } catch (Exception e) {
             LOG.warn("Sample role query field query fail.", e);

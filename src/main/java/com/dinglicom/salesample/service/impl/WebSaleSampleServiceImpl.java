@@ -28,9 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class WebSaleSampleServiceImpl implements WebSaleSampleService {
 
     private final static Logger LOG = LoggerFactory.getLogger(WebSaleSampleServiceImpl.class);
+    @PersistenceContext
+    private EntityManager em;
     @Resource
     private ReportSubscribeNumberDao reportSubscribeNumberDao;
     @Resource
@@ -118,267 +124,704 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
     @Override
     @Transactional(readOnly = true)
     public WebSaleSampleResp queryByRolesample(WebSaleSampleReq req, UserInfo quser) {
-        WebSaleSampleResp resp = new WebSaleSampleResp();
-        if (null == req.getRole() || null == req.getType()) {
-            return resp;
-        }
-
         Calendar c = Calendar.getInstance();
-        if (null != quser.getUserType()) {
-            switch (quser.getUserType()) {
-                case UserInfoService.USER_ROLE_ADMINISTRATOR:
-                case UserInfoService.USER_ROLE_CHIEF:
-                    resp = queryByAdminOrCom(req, quser, c);
-                    break;
-                case UserInfoService.USER_ROLE_MANAGER:
-                    resp = queryByDep(req, quser, c);
-                    break;
-                case UserInfoService.USER_ROLE_SALESMAN:
-                    resp = queryBySalesman(req, quser, c);
+        WebSaleSampleResp resp = new WebSaleSampleResp();
+        if (null != req.getRole()) {
+            switch (req.getRole()) {
+                case UserInfoService.USER_ROLE_STATION:
+                    //奶站
+                    if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(quser.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_MANAGER.equals(quser.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_DEALER.equals(quser.getUserType()) || UserInfoService.USER_ROLE_STATION.equals(quser.getUserType())) {
+                        resp = queryStation(req, c, quser);
+                    }
                     break;
                 case UserInfoService.USER_ROLE_DEALER:
-                    resp = queryByDarler(req, quser, c);
+                    //经销商
+                    if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(quser.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_MANAGER.equals(quser.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_DEALER.equals(quser.getUserType())) {
+                        resp = queryDealer(req, c, quser);
+                    }
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    //销售人员
+                    if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(quser.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_MANAGER.equals(quser.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(quser.getUserType())) {
+                        return querySalesman(req, c, quser);
+                    }
+                    break;
+                case UserInfoService.USER_ROLE_MANAGER:
+                    //销售主管
+                    if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(quser.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(quser.getUserType())
+                            || UserInfoService.USER_ROLE_MANAGER.equals(quser.getUserType())) {
+                        resp = queryDep(req, c, quser);
+                    }
+                    break;
+                case UserInfoService.USER_ROLE_CHIEF:
+                    //销售总监
+                    if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(quser.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(quser.getUserType())) {
+                        resp = queryCom(req, c);
+                    }
+                    break;
+            }
+        }
+        return resp;
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        if (null == req.getRole() || null == req.getType()) {
+//            return resp;
+//        }
+//        Calendar c = Calendar.getInstance();
+//        resp = queryByAdminOrCom(req, c, quser);
+//
+//        if (null != quser.getUserType()) {
+//            switch (quser.getUserType()) {
+//                case UserInfoService.USER_ROLE_ADMINISTRATOR:
+//                case UserInfoService.USER_ROLE_CHIEF:
+////                    resp = queryByAdminOrCom(req, quser, c);
+//                    resp = queryByAdminOrCom(req, c, quser);
+//                    break;
+//                case UserInfoService.USER_ROLE_MANAGER:
+//                    resp = queryByDep(req, quser, c);
+//                    break;
+//                case UserInfoService.USER_ROLE_SALESMAN:
+//                    resp = queryBySalesman(req, quser, c);
+//                    break;
+//                case UserInfoService.USER_ROLE_DEALER:
+//                    resp = queryByDarler(req, quser, c);
+//                    break;
+//                case UserInfoService.USER_ROLE_STATION:
+//                    resp = queryByStation(req, quser, c);
+//                    break;
+//            }
+//        }
+//        return resp;
+    }
+
+    private String getSalesmanHql(WebSaleSampleReq req, boolean count, UserInfo admin) {
+        StringBuilder hqlSb = new StringBuilder("select ");
+        if (count) {
+            hqlSb.append("count(a.id)");
+        } else {
+            hqlSb.append("new com.dinglicom.salesample.domain.WebSaleSampleItem(a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone, sum(totalnum))");
+        }
+        hqlSb.append(" from EveryDayEveryOrgReport a where a.year=:year");
+        if ("month".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.month=:month");
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.quarter=:quarter");
+        }
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    hqlSb.append(" and a.org.parent.id=:depId");
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    hqlSb.append(" and a.org.userinfo.id=:salesId");
+                    break;
+            }
+        }
+        if (null != req.getQuery()) {
+            hqlSb.append(" and (a.org.userinfo.realname like :qry or a.org.userinfo.phone like :qry)");
+        }
+        hqlSb.append(" group by a.org.userinfo.id, a.org.userinfo.realname, a.org.userinfo.phone");
+        if (!count) {
+            hqlSb.append(" order by sum(totalnum) desc");
+        }
+        return hqlSb.toString();
+    }
+
+    private String getStationHql(WebSaleSampleReq req, boolean count, UserInfo admin) {
+        StringBuilder hqlSb = new StringBuilder("select ");
+        if (count) {
+            hqlSb.append("count(a.id)");
+        } else {
+            hqlSb.append("new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone)");
+        }
+        hqlSb.append(" from EveryDayEveryOrgReport a where a.year=:year");
+        if ("month".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.month=:month");
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.quarter=:quarter");
+        }
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    hqlSb.append(" and a.org.parent.id=:depId");
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    hqlSb.append(" and a.org.userinfo.id=:salesId");
+                    break;
+                case UserInfoService.USER_ROLE_DEALER:
+                    hqlSb.append(" and a.org.dealer.id=:dealerId");
                     break;
                 case UserInfoService.USER_ROLE_STATION:
-                    resp = queryByStation(req, quser, c);
+                    hqlSb.append(" and a.org.id=:stationId");
                     break;
             }
         }
-        return resp;
+        if (null != req.getQuery()) {
+            hqlSb.append(" and (a.org.name like :qry or a.org.responsible_phone like :qry)");
+        }
+        hqlSb.append(" group by a.org.id, a.org.name, a.org.responsible_man, a.org.responsible_phone ");
+        if (!count) {
+            hqlSb.append(" order by sum(totalnum) desc");
+        }
+        return hqlSb.toString();
     }
 
-    private WebSaleSampleResp queryByAdminOrCom(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+    private String getDealerHql(WebSaleSampleReq req, boolean count, UserInfo admin) {
+        StringBuilder hqlSb = new StringBuilder("select ");
+        if (count) {
+            hqlSb.append("count(a.id)");
+        } else {
+            hqlSb.append("new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone)");
+        }
+        hqlSb.append(" from EveryDayEveryOrgReport a where a.year=:year");
+        if ("month".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.month=:month");
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.quarter=:quarter");
+        }
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    hqlSb.append(" and a.org.parent.id=:depId");
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    hqlSb.append(" and a.org.userinfo.id=:salesId");
+                    break;
+                case UserInfoService.USER_ROLE_DEALER:
+                    hqlSb.append(" and a.org.dealer.id=:dealerId");
+                    break;
+            }
+        }
+        if (null != req.getQuery()) {
+            hqlSb.append(" and (a.org.dealer.name like :qry or a.org.dealer.responsible_phone like :qry)");
+        }
+        hqlSb.append(" group by a.org.dealer.id, a.org.dealer.name, a.org.dealer.responsible_man, a.org.dealer.responsible_phone ");
+        if (!count) {
+            hqlSb.append(" order by sum(totalnum) desc");
+        }
+        return hqlSb.toString();
+    }
+
+    private String getDepHql(WebSaleSampleReq req, boolean count, UserInfo admin) {
+        StringBuilder hqlSb = new StringBuilder("select ");
+        if (count) {
+            hqlSb.append("count(a.id)");
+        } else {
+            hqlSb.append("new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum), a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone)");
+        }
+        hqlSb.append(" from EveryDayEveryOrgReport a where a.year=:year");
+        if ("month".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.month=:month");
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.quarter=:quarter");
+        }
+        if (UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
+            hqlSb.append(" and a.org.parent.id=:depId");
+        }
+        if (null != req.getQuery()) {
+            hqlSb.append(" and (a.org.userinfo.org.name like :qry or a.org.userinfo.org.responsible_phone like :qry)");
+        }
+        hqlSb.append(" group by a.org.userinfo.org.id, a.org.userinfo.org.name, a.org.userinfo.org.responsible_man, a.org.userinfo.org.responsible_phone ");
+        if (!count) {
+            hqlSb.append(" order by sum(totalnum) desc");
+        }
+        return hqlSb.toString();
+    }
+
+    private String getComHql(WebSaleSampleReq req) {
+        StringBuilder hqlSb = new StringBuilder("select new com.dinglicom.salesample.domain.WebSaleSampleItem(sum(totalnum))");
+        hqlSb.append(" from EveryDayEveryOrgReport a where a.year=:year");
+        if ("month".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.month=:month");
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            hqlSb.append(" and a.quarter=:quarter");
+        }
+        return hqlSb.toString();
+    }
+
+    private void setQuery(Query q, WebSaleSampleReq req, Calendar c) {
+        q.setParameter("year", DateUtil.getYear(c));
+        if ("month".equalsIgnoreCase(req.getType())) {
+            q.setParameter("month", DateUtil.getMonth(c));
+        } else if ("quarter".equalsIgnoreCase(req.getType())) {
+            q.setParameter("quarter", DateUtil.getQuarter(c));
+        }
+        if (null != req.getQuery()) {
+            q.setParameter("qry", "%" + req.getQuery() + "%");
+        }
+    }
+
+    private WebSaleSampleResp querySalesman(WebSaleSampleReq req, Calendar c, UserInfo admin) {
         WebSaleSampleResp resp = new WebSaleSampleResp();
         Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+        Query qc = em.createQuery(getSalesmanHql(req, true, admin));
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    qc.setParameter("depId", admin.getOrg().getId());
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    qc.setParameter("salesId", admin.getId());
+                    break;
             }
-
-            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
-            return resp;
-        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllStationByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDepByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDepByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDepByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_MANAGER);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_CHIEF.equalsIgnoreCase(req.getRole())) {//销售总监
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
-            }
-            //补充销售总监的信息
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                List<WebSaleSampleItem> list = userInfoDao.findUserType(UserInfoService.USER_ROLE_CHIEF, Boolean.FALSE);
-                WebSaleSampleItem user = null;
-                if (null != list && list.size() > 0) {
-                    user = list.get(0);
+        }
+        setQuery(qc, req, c);
+        int count = qc.getResultList().size();
+        long tp = (count + req.getNum() - 1) / req.getNum();
+//        System.out.println("Total element:" + count + " pages:" + tp);
+        if (req.getPage() <= tp) {
+            Query q = em.createQuery(getSalesmanHql(req, false, admin));
+            if (null != admin.getUserType()) {
+                switch (admin.getUserType()) {
+                    case UserInfoService.USER_ROLE_MANAGER:
+                        q.setParameter("depId", admin.getOrg().getId());
+                        break;
+                    case UserInfoService.USER_ROLE_SALESMAN:
+                        q.setParameter("salesId", admin.getId());
+                        break;
                 }
-                int i = 1;
-                for (WebSaleSampleItem item : page.getContent()) {
-                    item.setRank((req.getPage() - 1) * req.getNum() + i);
-                    if (null != user) {
-                        item.setUid(user.getUid());
-                        item.setManager(user.getManager());
-                        item.setTel(user.getTel());
-                    }
+            }
+            setQuery(q, req, c);
+            q.setFirstResult((req.getPage() - 1) * req.getNum());
+            q.setMaxResults(req.getNum());
+            page = new PageImpl<WebSaleSampleItem>(q.getResultList(), buildPageRequest(req.getPage(), req.getNum()), count);
+        } else {
+            page = new PageImpl<WebSaleSampleItem>(new ArrayList<WebSaleSampleItem>(), buildPageRequest(req.getPage(), req.getNum()), count);
+        }
+        processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
+        return resp;
+    }
+
+    private WebSaleSampleResp queryStation(WebSaleSampleReq req, Calendar c, UserInfo admin) {
+        WebSaleSampleResp resp = new WebSaleSampleResp();
+        Page<WebSaleSampleItem> page;
+        Query qc = em.createQuery(getStationHql(req, true, admin));
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    qc.setParameter("depId", admin.getOrg().getId());
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    qc.setParameter("salesId", admin.getId());
+                    break;
+                case UserInfoService.USER_ROLE_DEALER:
+                    qc.setParameter("dealerId", admin.getOrg().getId());
+                    break;
+                case UserInfoService.USER_ROLE_STATION:
+                    qc.setParameter("stationId", admin.getOrg().getId());
+                    break;
+            }
+        }
+        setQuery(qc, req, c);
+        int count = qc.getResultList().size();
+        long tp = (count + req.getNum() - 1) / req.getNum();
+//        System.out.println("Total element:" + count + " pages:" + tp);
+        if (req.getPage() <= tp) {
+            Query q = em.createQuery(getStationHql(req, false, admin));
+            if (null != admin.getUserType()) {
+                switch (admin.getUserType()) {
+                    case UserInfoService.USER_ROLE_MANAGER:
+                        q.setParameter("depId", admin.getOrg().getId());
+                        break;
+                    case UserInfoService.USER_ROLE_SALESMAN:
+                        q.setParameter("salesId", admin.getId());
+                        break;
+                    case UserInfoService.USER_ROLE_DEALER:
+                        q.setParameter("dealerId", admin.getOrg().getId());
+                        break;
+                    case UserInfoService.USER_ROLE_STATION:
+                        q.setParameter("stationId", admin.getOrg().getId());
+                        break;
                 }
-                resp.setData(page.getContent());
-                resp.setTotal_num(page.getTotalElements());
-                return resp;
             }
+            setQuery(q, req, c);
+            q.setFirstResult((req.getPage() - 1) * req.getNum());
+            q.setMaxResults(req.getNum());
+            page = new PageImpl<WebSaleSampleItem>(q.getResultList(), buildPageRequest(req.getPage(), req.getNum()), count);
+        } else {
+            page = new PageImpl<WebSaleSampleItem>(new ArrayList<WebSaleSampleItem>(), buildPageRequest(req.getPage(), req.getNum()), count);
         }
+        processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
         return resp;
     }
 
-    private WebSaleSampleResp queryByDep(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+    private WebSaleSampleResp queryDealer(WebSaleSampleReq req, Calendar c, UserInfo admin) {
         WebSaleSampleResp resp = new WebSaleSampleResp();
-        if(null == quser.getOrg() || null == quser.getOrg().getId()) return resp;
         Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllSalemanByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+        Query qc = em.createQuery(getDealerHql(req, true, admin));
+        if (null != admin.getUserType()) {
+            switch (admin.getUserType()) {
+                case UserInfoService.USER_ROLE_MANAGER:
+                    qc.setParameter("depId", admin.getOrg().getId());
+                    break;
+                case UserInfoService.USER_ROLE_SALESMAN:
+                    qc.setParameter("salesId", admin.getId());
+                    break;
+                case UserInfoService.USER_ROLE_DEALER:
+                    qc.setParameter("dealerId", admin.getOrg().getId());
+                    break;
             }
+        }
+        setQuery(qc, req, c);
+        int count = qc.getResultList().size();
+        long tp = (count + req.getNum() - 1) / req.getNum();
+//        System.out.println("Total element:" + count + " pages:" + tp);
+        if (req.getPage() <= tp) {
+            Query q = em.createQuery(getDealerHql(req, false, admin));
+            if (null != admin.getUserType()) {
+                switch (admin.getUserType()) {
+                    case UserInfoService.USER_ROLE_MANAGER:
+                        q.setParameter("depId", admin.getOrg().getId());
+                        break;
+                    case UserInfoService.USER_ROLE_SALESMAN:
+                        q.setParameter("salesId", admin.getId());
+                        break;
+                    case UserInfoService.USER_ROLE_DEALER:
+                        q.setParameter("dealerId", admin.getOrg().getId());
+                        break;
+                }
+            }
+            setQuery(q, req, c);
+            q.setFirstResult((req.getPage() - 1) * req.getNum());
+            q.setMaxResults(req.getNum());
+            page = new PageImpl<WebSaleSampleItem>(q.getResultList(), buildPageRequest(req.getPage(), req.getNum()), count);
+        } else {
+            page = new PageImpl<WebSaleSampleItem>(new ArrayList<WebSaleSampleItem>(), buildPageRequest(req.getPage(), req.getNum()), count);
+        }
+        processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
+        return resp;
+    }
 
-            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
+    private WebSaleSampleResp queryDep(WebSaleSampleReq req, Calendar c, UserInfo admin) {
+        WebSaleSampleResp resp = new WebSaleSampleResp();
+        Page<WebSaleSampleItem> page;
+        Query qc = em.createQuery(getDepHql(req, true, admin));
+        setQuery(qc, req, c);
+        if (UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
+            qc.setParameter("depId", admin.getOrg().getId());
+        }
+        int count = qc.getResultList().size();
+        long tp = (count + req.getNum() - 1) / req.getNum();
+//        System.out.println("Total element:" + count + " pages:" + tp);
+        if (req.getPage() <= tp) {
+            Query q = em.createQuery(getDepHql(req, false, admin));
+            if (UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
+                q.setParameter("depId", admin.getOrg().getId());
+            }
+            setQuery(q, req, c);
+            q.setFirstResult((req.getPage() - 1) * req.getNum());
+            q.setMaxResults(req.getNum());
+            page = new PageImpl<WebSaleSampleItem>(q.getResultList(), buildPageRequest(req.getPage(), req.getNum()), count);
+        } else {
+            page = new PageImpl<WebSaleSampleItem>(new ArrayList<WebSaleSampleItem>(), buildPageRequest(req.getPage(), req.getNum()), count);
+        }
+        processResult(page, resp, req, UserInfoService.USER_ROLE_MANAGER);
+        return resp;
+    }
+
+    private WebSaleSampleResp queryCom(WebSaleSampleReq req, Calendar c) {
+        WebSaleSampleResp resp = new WebSaleSampleResp();
+        Query q = em.createQuery(getComHql(req));
+        setQuery(q, req, c);
+        Page<WebSaleSampleItem> page = new PageImpl<WebSaleSampleItem>(q.getResultList(), buildPageRequest(req.getPage(), req.getNum()), 1);
+
+        //补充销售总监的信息
+        if (null != page.getContent() && page.getContent().size() > 0) {
+            List<WebSaleSampleItem> list = userInfoDao.findUserType(UserInfoService.USER_ROLE_CHIEF, Boolean.FALSE);
+            WebSaleSampleItem user = null;
+            if (null != list && list.size() > 0) {
+                user = list.get(0);
+            }
+            int i = 1;
+            for (WebSaleSampleItem item : page.getContent()) {
+                item.setRank((req.getPage() - 1) * req.getNum() + i);
+                if (null != user) {
+                    item.setUid(user.getUid());
+                    item.setManager(user.getManager());
+                    item.setTel(user.getTel());
+                }
+            }
+            resp.setData(page.getContent());
+            resp.setTotal_num(page.getTotalElements());
             return resp;
-        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllStationByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDarlerByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDepByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDepByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDepByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_MANAGER);
-                return resp;
-            }
         }
         return resp;
     }
 
-    private WebSaleSampleResp queryBySalesman(WebSaleSampleReq req, UserInfo quser, Calendar c) {
-        WebSaleSampleResp resp = new WebSaleSampleResp();
-        
-        Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
-            }
+//    private WebSaleSampleResp queryByAdminOrCom(WebSaleSampleReq req, Calendar c, UserInfo admin) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+//            if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_DEALER.equals(admin.getUserType()) || UserInfoService.USER_ROLE_STATION.equals(admin.getUserType())) {
+//                return queryStation(req, c, admin);
+//            }
+//        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
+//            if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_DEALER.equals(admin.getUserType())) {
+//                return queryDealer(req, c, admin);
+//            }
+//        } else if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) { //销售人员
+//            if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType()) || UserInfoService.USER_ROLE_SALESMAN.equals(admin.getUserType())) {
+//                return querySalesman(req, c, admin);
+//            }
+//        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
+//            if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(admin.getUserType())
+//                    || UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
+//                return queryDep(req, c, admin);
+//            }
+//        } else if (UserInfoService.USER_ROLE_CHIEF.equalsIgnoreCase(req.getRole())) {//销售总监
+//            if (UserInfoService.USER_ROLE_ADMINISTRATOR.equals(admin.getUserType()) || UserInfoService.USER_ROLE_CHIEF.equals(admin.getUserType())) {
+//                return queryCom(req, c);
+//            }
+//        }
+//        return resp;
+//    }
 
-            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
-            return resp;
-        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
-//            if(null == quser.getOrg() || null == quser.getOrg().getUserinfo()) return resp;
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
-                return resp;
-            }
-        }
-        return resp;
-    }
+//    private WebSaleSampleResp queryByAdminOrCom(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        Page<WebSaleSampleItem> page = null;
+//        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//
+//            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
+//            return resp;
+//        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllStationByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDepByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDepByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDepByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_MANAGER);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_CHIEF.equalsIgnoreCase(req.getRole())) {//销售总监
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//            //补充销售总监的信息
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                List<WebSaleSampleItem> list = userInfoDao.findUserType(UserInfoService.USER_ROLE_CHIEF, Boolean.FALSE);
+//                WebSaleSampleItem user = null;
+//                if (null != list && list.size() > 0) {
+//                    user = list.get(0);
+//                }
+//                int i = 1;
+//                for (WebSaleSampleItem item : page.getContent()) {
+//                    item.setRank((req.getPage() - 1) * req.getNum() + i);
+//                    if (null != user) {
+//                        item.setUid(user.getUid());
+//                        item.setManager(user.getManager());
+//                        item.setTel(user.getTel());
+//                    }
+//                }
+//                resp.setData(page.getContent());
+//                resp.setTotal_num(page.getTotalElements());
+//                return resp;
+//            }
+//        }
+//        return resp;
+//    }
 
-    private WebSaleSampleResp queryByDarler(WebSaleSampleReq req, UserInfo quser, Calendar c) {
-        WebSaleSampleResp resp = new WebSaleSampleResp();
-        if(null == quser.getOrg() || null == quser.getOrg().getDealer()) return resp;
-        Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllStationByDarlerYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
-                return resp;
-            }
-        }
-        return resp;
-    }
-
-    private WebSaleSampleResp queryByStation(WebSaleSampleReq req, UserInfo quser, Calendar c) {
-        WebSaleSampleResp resp = new WebSaleSampleResp();
-        if(null == quser.getOrg()) return resp;
-        Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByStationMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllStationByStationQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllStationByStationYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
-                return resp;
-            }
-        }
-        return resp;
-    }
+//    private WebSaleSampleResp queryByDep(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        if (null == quser.getOrg() || null == quser.getOrg().getId()) {
+//            return resp;
+//        }
+//        Page<WebSaleSampleItem> page;
+//        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+//            }
+//
+//            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
+//            return resp;
+//        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDepByDepMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDepByDepQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDepByDepYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_MANAGER);
+//                return resp;
+//            }
+//        }
+//        return resp;
+//    }
+//
+//    private WebSaleSampleResp queryBySalesman(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//
+//        Page<WebSaleSampleItem> page;
+//        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllSalemanBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
+//            }
+//
+//            processResult(page, resp, req, UserInfoService.USER_ROLE_SALESMAN);
+//            return resp;
+//        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+////            if(null == quser.getOrg() || null == quser.getOrg().getUserinfo()) return resp;
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllStationBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
+//                return resp;
+//            }
+//        }
+//        return resp;
+//    }
+//
+//    private WebSaleSampleResp queryByDarler(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        if (null == quser.getOrg() || null == quser.getOrg().getDealer()) {
+//            return resp;
+//        }
+//        Page<WebSaleSampleItem> page;
+//        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDarlerMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDarlerQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllStationByDarlerYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//经销商
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllDarlerBySalesmanYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getDealer().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_DEALER);
+//                return resp;
+//            }
+//        }
+//        return resp;
+//    }
+//
+//    private WebSaleSampleResp queryByStation(WebSaleSampleReq req, UserInfo quser, Calendar c) {
+//        WebSaleSampleResp resp = new WebSaleSampleResp();
+//        if (null == quser.getOrg()) {
+//            return resp;
+//        }
+//        Page<WebSaleSampleItem> page;
+//        if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole())) {//奶站
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByStationMonth(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllStationByStationQuater(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllStationByStationYear(buildPageRequest(req.getPage(), req.getNum()), quser.getOrg().getId(), DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                processResult(page, resp, req, UserInfoService.USER_ROLE_STATION);
+//                return resp;
+//            }
+//        }
+//        return resp;
+//    }
 
     private void processResult(Page<WebSaleSampleItem> page, WebSaleSampleResp resp, WebSaleSampleReq req, String role) {
 //        Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
@@ -477,143 +920,143 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
         return resp;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public WebSaleSampleQueryResp queryByQueryfieldsample(WebSaleSampleReq req) {
-        WebSaleSampleQueryResp resp = new WebSaleSampleQueryResp();
-        if (null == req.getRole() || null == req.getType()) {
-            return resp;
-        }
-
-        Calendar c = Calendar.getInstance();
-        Page<WebSaleSampleItem> page;
-        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
-            LOG.info("Saleman Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldSalemanByMonth(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldSalemanByQuater(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryFieldSalemanByYear(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c));
-            }
-        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//奶站//经销商
-            LOG.info("Station or Dealer Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
-            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), req.getRole().toUpperCase(), UserInfoService.USER_ROLE_ADMINISTRATOR, Boolean.FALSE);
-            List<Long> orgs = new ArrayList<Long>();
-            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
-            for (WebSaleSampleItem itm : list) {
-                orgs.add(itm.getAmount());
-                orgSaleCount.put(itm.getAmount(), itm);
-            }
-            if (orgs.size() <= 0) {
-                return resp;
-            }
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldStationByMonth(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldStationByQuater(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryFieldStationByYear(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                int i = 1;
-                for (WebSaleSampleItem item : page.getContent()) {
-                    item.setRank((req.getPage() - 1) * req.getNum() + i);
-                    WebSaleSampleItem user = orgSaleCount.get(item.getUid());
-                    if (null != user) {
-                        item.setUid(user.getUid());
-                        item.setManager(user.getManager());
-                        item.setTel(user.getTel());
-                    }
-                }
-                resp.setData(page.getContent());
-                resp.setTotal_num(page.getTotalElements());
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
-            LOG.info("Dep Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
-            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), SysOranizagionService.ORG_TYPE_DEP, UserInfoService.USER_ROLE_MANAGER, Boolean.FALSE);
-            List<Long> orgs = new ArrayList<Long>();
-            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
-            for (WebSaleSampleItem itm : list) {
-                orgs.add(itm.getAmount());
-                orgSaleCount.put(itm.getAmount(), itm);
-            }
-            if (orgs.size() <= 0) {
-                return resp;
-            }
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldDepByMonth(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryFieldDepByQuater(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryFieldDepByYear(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c));
-            }
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                int i = 1;
-                for (WebSaleSampleItem item : page.getContent()) {
-                    item.setRank((req.getPage() - 1) * req.getNum() + i);
-                    WebSaleSampleItem user = orgSaleCount.get(item.getUid());
-                    if (null != user) {
-                        item.setUid(user.getUid());
-                        item.setManager(user.getManager());
-                        item.setTel(user.getTel());
-                    }
-                }
-                resp.setData(page.getContent());
-                resp.setTotal_num(page.getTotalElements());
-                return resp;
-            }
-        } else if (UserInfoService.USER_ROLE_CHIEF.equalsIgnoreCase(req.getRole())) {//销售总监
-            LOG.info("Com Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
-            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), SysOranizagionService.ORG_TYPE_COM, UserInfoService.USER_ROLE_CHIEF, Boolean.FALSE);
-            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
-            WebSaleSampleItem user = null;
-            for (WebSaleSampleItem itm : list) {
-                if (req.getQuery().equalsIgnoreCase(itm.getManager()) || req.getQuery().equalsIgnoreCase(itm.getTel())) {
-                    orgSaleCount.put(itm.getAmount(), itm);
-                    user = itm;
-                    break;
-                }
-            }
-            if (orgSaleCount.size() <= 0 || null == user) {
-                return resp;
-            }
-            if ("month".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
-            } else if ("quarter".equalsIgnoreCase(req.getType())) {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
-            } else {
-                page = everyDayEveryOrgReportDao.queryAllComByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
-            }
-            //补充销售总监的信息
-            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
-                int i = 1;
-                for (WebSaleSampleItem item : page.getContent()) {
-                    item.setRank((req.getPage() - 1) * req.getNum() + i);
-                    item.setUid(user.getUid());
-                    item.setManager(user.getManager());
-                    item.setTel(user.getTel());
-                }
-                resp.setData(page.getContent());
-                resp.setTotal_num(page.getTotalElements());
-                return resp;
-            }
-        } else {
-            return resp;
-        }
-        if (null != page && null != page.getContent()) {
-            resp.setData(page.getContent());
-            resp.setTotal_num(page.getTotalElements());
-            //补充排名
-            int i = 1;
-            for (WebSaleSampleItem item : page.getContent()) {
-                item.setRank((req.getPage() - 1) * req.getNum() + i);
-            }
-        }
-
-        return resp;
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public WebSaleSampleQueryResp queryByQueryfieldsample(WebSaleSampleReq req) {
+//        WebSaleSampleQueryResp resp = new WebSaleSampleQueryResp();
+//        if (null == req.getRole() || null == req.getType()) {
+//            return resp;
+//        }
+//
+//        Calendar c = Calendar.getInstance();
+//        Page<WebSaleSampleItem> page;
+//        if (UserInfoService.USER_ROLE_SALESMAN.equalsIgnoreCase(req.getRole())) {//销售人员
+//            LOG.info("Saleman Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldSalemanByMonth(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldSalemanByQuater(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryFieldSalemanByYear(buildPageRequest(req.getPage(), req.getNum()), req.getQuery(), DateUtil.getYear(c));
+//            }
+//        } else if (UserInfoService.USER_ROLE_STATION.equalsIgnoreCase(req.getRole()) || UserInfoService.USER_ROLE_DEALER.equalsIgnoreCase(req.getRole())) {//奶站//经销商
+//            LOG.info("Station or Dealer Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
+//            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), req.getRole().toUpperCase(), UserInfoService.USER_ROLE_STATION, Boolean.FALSE);
+//            List<Long> orgs = new ArrayList<Long>();
+//            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
+//            for (WebSaleSampleItem itm : list) {
+//                orgs.add(itm.getAmount());
+//                orgSaleCount.put(itm.getAmount(), itm);
+//            }
+//            if (orgs.size() <= 0) {
+//                return resp;
+//            }
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldStationByMonth(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldStationByQuater(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryFieldStationByYear(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                int i = 1;
+//                for (WebSaleSampleItem item : page.getContent()) {
+//                    item.setRank((req.getPage() - 1) * req.getNum() + i);
+//                    WebSaleSampleItem user = orgSaleCount.get(item.getUid());
+//                    if (null != user) {
+//                        item.setUid(user.getUid());
+//                        item.setManager(user.getManager());
+//                        item.setTel(user.getTel());
+//                    }
+//                }
+//                resp.setData(page.getContent());
+//                resp.setTotal_num(page.getTotalElements());
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_MANAGER.equalsIgnoreCase(req.getRole())) {//销售主管
+//            LOG.info("Dep Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
+//            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), SysOranizagionService.ORG_TYPE_DEP, UserInfoService.USER_ROLE_MANAGER, Boolean.FALSE);
+//            List<Long> orgs = new ArrayList<Long>();
+//            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
+//            for (WebSaleSampleItem itm : list) {
+//                orgs.add(itm.getAmount());
+//                orgSaleCount.put(itm.getAmount(), itm);
+//            }
+//            if (orgs.size() <= 0) {
+//                return resp;
+//            }
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldDepByMonth(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryFieldDepByQuater(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryFieldDepByYear(buildPageRequest(req.getPage(), req.getNum()), orgs, DateUtil.getYear(c));
+//            }
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                int i = 1;
+//                for (WebSaleSampleItem item : page.getContent()) {
+//                    item.setRank((req.getPage() - 1) * req.getNum() + i);
+//                    WebSaleSampleItem user = orgSaleCount.get(item.getUid());
+//                    if (null != user) {
+//                        item.setUid(user.getUid());
+//                        item.setManager(user.getManager());
+//                        item.setTel(user.getTel());
+//                    }
+//                }
+//                resp.setData(page.getContent());
+//                resp.setTotal_num(page.getTotalElements());
+//                return resp;
+//            }
+//        } else if (UserInfoService.USER_ROLE_CHIEF.equalsIgnoreCase(req.getRole())) {//销售总监
+//            LOG.info("Com Query role[" + req.getRole() + "] query[" + req.getQuery() + "] type[" + req.getType() + "]");
+//            List<WebSaleSampleItem> list = userInfoDao.findUserByOrgType(req.getQuery(), SysOranizagionService.ORG_TYPE_COM, UserInfoService.USER_ROLE_CHIEF, Boolean.FALSE);
+//            Map<Long, WebSaleSampleItem> orgSaleCount = new HashMap<Long, WebSaleSampleItem>();
+//            WebSaleSampleItem user = null;
+//            for (WebSaleSampleItem itm : list) {
+//                if (req.getQuery().equalsIgnoreCase(itm.getManager()) || req.getQuery().equalsIgnoreCase(itm.getTel())) {
+//                    orgSaleCount.put(itm.getAmount(), itm);
+//                    user = itm;
+//                    break;
+//                }
+//            }
+//            if (orgSaleCount.size() <= 0 || null == user) {
+//                return resp;
+//            }
+//            if ("month".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminMonth(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getMonth(c));
+//            } else if ("quarter".equalsIgnoreCase(req.getType())) {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminQuater(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c), DateUtil.getQuarter(c));
+//            } else {
+//                page = everyDayEveryOrgReportDao.queryAllComByAdminYear(buildPageRequest(req.getPage(), req.getNum()), DateUtil.getYear(c));
+//            }
+//            //补充销售总监的信息
+//            if (null != page && null != page.getContent() && page.getContent().size() > 0) {
+//                int i = 1;
+//                for (WebSaleSampleItem item : page.getContent()) {
+//                    item.setRank((req.getPage() - 1) * req.getNum() + i);
+//                    item.setUid(user.getUid());
+//                    item.setManager(user.getManager());
+//                    item.setTel(user.getTel());
+//                }
+//                resp.setData(page.getContent());
+//                resp.setTotal_num(page.getTotalElements());
+//                return resp;
+//            }
+//        } else {
+//            return resp;
+//        }
+//        if (null != page && null != page.getContent()) {
+//            resp.setData(page.getContent());
+//            resp.setTotal_num(page.getTotalElements());
+//            //补充排名
+//            int i = 1;
+//            for (WebSaleSampleItem item : page.getContent()) {
+//                item.setRank((req.getPage() - 1) * req.getNum() + i);
+//            }
+//        }
+//
+//        return resp;
+//    }
 
     /**
      * 创建分页请求.
