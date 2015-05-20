@@ -16,6 +16,7 @@ import com.dinglicom.frame.sys.domain.ProvinceRespItem;
 import com.dinglicom.frame.sys.domain.RegionRespItem;
 import com.dinglicom.frame.sys.domain.WorkerOrgRespItem;
 import com.dinglicom.frame.sys.entity.SysOranizagion;
+import com.dinglicom.pricepolicy.demain.OrgDealarRespItem;
 import com.dinglicom.salesman.domain.StationRespItem;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -156,4 +157,20 @@ public interface SysOranizagionDao extends PagingAndSortingRepository<SysOraniza
     
     @Query("select new com.dinglicom.dep.domain.CompanyDetail(name, responsible_man, phone, address) from SysOranizagion a where a.type =:type and a.signDelete=:signDelete")
     List<CompanyDetail> findAllCompany(@Param(value = "type")String type, @Param(value = "signDelete")Boolean signDelete);
+    
+    
+    @Query("select new com.dinglicom.pricepolicy.demain.OrgDealarRespItem(id, name) from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.signDelete=:signDelete")
+    List<OrgDealarRespItem> findAllDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "signDelete")Boolean signDelete);
+    
+    
+    @Query("select new com.dinglicom.pricepolicy.demain.OrgDealarRespItem(id, name) from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.name like :name and a.signDelete=:signDelete")
+    List<OrgDealarRespItem> findAllDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "name")String name, @Param(value = "signDelete")Boolean signDelete);
+    
+    @Query("from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.signDelete=:signDelete")
+    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "signDelete")Boolean signDelete);
+    
+    
+    @Query("from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.id in (:ids) and a.signDelete=:signDelete")
+    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "ids")List<Long> ids, @Param(value = "signDelete")Boolean signDelete);
+    
 }

@@ -107,3 +107,48 @@ CREATE TABLE dealer_dispatch_record (
 5.user_info表增加字段：
   mysql:dealer_id bigint,dealer_name varchar(120)
   oracle:dealer_id number(20), dealer_name varchar2(120)
+
+
+
+价格策略模板变更
+新增表
+价格模板、价格模板列表、价格策略历史表
+mysql:
+     CREATE TABLE price_template (
+        id BIGINT NOT NULL auto_increment,
+        name VARCHAR(120),
+        temptable_desc VARCHAR(300),
+        apply BIT,
+        createman VARCHAR(60),
+        sign_delete BIT,
+        createdate DATETIME,
+        primary key (id)
+     ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+
+     CREATE TABLE price_template_detail (
+        id BIGINT NOT NULL auto_increment,
+        product_id BIGINT,
+        product_name VARCHAR(120),
+        product_type INT(11),
+        report_price DECIMAL(10,4),
+        template_id BIGINT,
+        last_update_man VARCHAR(60),
+        last_update_date DATETIME,
+        sign_delete BIT,
+        createdate DATETIME,
+        primary key (id)
+     ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+
+     CREATE TABLE price_policy_history (
+        id BIGINT NOT NULL auto_increment,
+        dealar_station_id BIGINT,
+        template_detail_id BIGINT,
+        template_id BIGINT,
+        product_id BIGINT,
+        current_policy BIT,
+        last_update_date DATETIME,
+        createman VARCHAR(60),
+        sign_delete BIT,
+        createdate DATETIME,
+        primary key (id)
+     ) ENGINE= InnoDB DEFAULT CHARSET=utf8;

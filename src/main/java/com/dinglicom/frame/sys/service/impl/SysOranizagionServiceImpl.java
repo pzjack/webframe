@@ -21,6 +21,7 @@ import com.dinglicom.frame.sys.entity.UserInfo;
 import com.dinglicom.frame.sys.repository.SysOranizagionDao;
 import com.dinglicom.frame.sys.service.SysOranizagionService;
 import com.dinglicom.frame.sys.service.UserInfoService;
+import com.dinglicom.pricepolicy.demain.OrgDealarRespItem;
 import com.dinglicom.salesman.domain.StationDetailResp;
 import com.dinglicom.salesman.domain.StationQueryReq;
 import com.dinglicom.salesman.domain.StationQueryResp;
@@ -407,6 +408,26 @@ public class SysOranizagionServiceImpl implements SysOranizagionService {
             resp.setMobile_phone(org.getPhone());
         }
         return resp;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrgDealarRespItem> findAllDealarAndNoDealarStation(String name) {
+        if(null == name || name.isEmpty()) {
+            return sysOranizagionDao.findAllDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, Boolean.FALSE);
+        } else {
+            return sysOranizagionDao.findAllDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, "%" + name + "%", Boolean.FALSE);
+        }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<SysOranizagion> findDealarAndNoDealarStation(List<Long> ids) {
+        if(null == ids || ids.size() <= 0) {
+            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, Boolean.FALSE);
+        } else {
+            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, ids, Boolean.FALSE);
+        }
     }
 
     /**

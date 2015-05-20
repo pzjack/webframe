@@ -16,6 +16,7 @@ import com.dinglicom.frame.sys.domain.WorkerOrgReq;
 import com.dinglicom.frame.sys.domain.WorkerOrgRespItem;
 import com.dinglicom.frame.sys.entity.SysOranizagion;
 import com.dinglicom.frame.sys.entity.UserInfo;
+import com.dinglicom.pricepolicy.demain.OrgDealarRespItem;
 import com.dinglicom.salesman.domain.StationDetailResp;
 import com.dinglicom.salesman.domain.StationQueryReq;
 import com.dinglicom.salesman.domain.StationQueryResp;
@@ -160,4 +161,18 @@ public interface SysOranizagionService {
      * @return 
      */
     StationDetailResp findById(long id);
+
+    /**
+     * 查找所有经销商及无经销商奶站
+     * @param name
+     * @return 
+     */
+    List<OrgDealarRespItem> findAllDealarAndNoDealarStation(String name);
+    
+    /**
+     * 查找所有经销商及无经销商奶站
+     * @param ids
+     * @return 
+     */
+    List<SysOranizagion> findDealarAndNoDealarStation(List<Long> ids);
 }
