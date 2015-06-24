@@ -26,7 +26,10 @@ import com.dinglicom.pricepolicy.demain.PriceTemplateGetResp;
 import com.dinglicom.pricepolicy.demain.PriceTemplateReq;
 import com.dinglicom.pricepolicy.demain.PriceTemplateResp;
 import com.dinglicom.pricepolicy.demain.PriceTemplateUpdateReq;
+import com.dinglicom.pricepolicy.entity.PricePolicyHistory;
 import com.dinglicom.pricepolicy.entity.PriceTemplate;
+import com.dinglicom.product.domain.ProductItem;
+import java.util.List;
 
 /**
  *
@@ -98,4 +101,18 @@ public interface PriceTemplateService {
      * @return 
      */
     PricePolicyHistoryResp findPricePolicyHistory(PricePolicyHistoryReq req);
+    
+    /**
+     * 查询经销商或者奶站的产品列表
+     * @param dealarId
+     * @return 
+     */
+    List<ProductItem> findDealarProduct(Long dealarId);
+     
+    /**
+     * 查询经销商或奶站的价格策略
+     * @param dealarId
+     * @return 
+     */
+    List<PricePolicyHistory> findDealarCurrentPricePolicy(Long dealarId);
 }

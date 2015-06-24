@@ -17,16 +17,13 @@ import com.dinglicom.salesample.domain.WebProductSaleReq;
 import com.dinglicom.salesample.domain.WebProductSaleResp;
 import com.dinglicom.salesample.domain.WebRoleuserProductReq;
 import com.dinglicom.salesample.domain.WebSaleSampleItem;
-import com.dinglicom.salesample.domain.WebSaleSampleQueryResp;
 import com.dinglicom.salesample.domain.WebSaleSampleReq;
 import com.dinglicom.salesample.domain.WebSaleSampleResp;
 import com.dinglicom.salesman.domain.ProductSaleSampleRespItem;
 import com.dinglicom.salesample.service.WebSaleSampleService;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -370,7 +367,7 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
             }
         }
         setQuery(qc, req, c);
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
 //        System.out.println("Total element:" + count + " pages:" + tp);
         if (req.getPage() <= tp) {
@@ -417,7 +414,7 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
             }
         }
         setQuery(qc, req, c);
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
 //        System.out.println("Total element:" + count + " pages:" + tp);
         if (req.getPage() <= tp) {
@@ -467,7 +464,7 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
             }
         }
         setQuery(qc, req, c);
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
 //        System.out.println("Total element:" + count + " pages:" + tp);
         if (req.getPage() <= tp) {
@@ -504,7 +501,7 @@ public class WebSaleSampleServiceImpl implements WebSaleSampleService {
         if (UserInfoService.USER_ROLE_MANAGER.equals(admin.getUserType())) {
             qc.setParameter("depId", admin.getOrg().getId());
         }
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
 //        System.out.println("Total element:" + count + " pages:" + tp);
         if (req.getPage() <= tp) {

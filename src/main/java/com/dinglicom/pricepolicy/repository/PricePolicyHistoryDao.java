@@ -17,6 +17,7 @@
 package com.dinglicom.pricepolicy.repository;
 
 import com.dinglicom.pricepolicy.entity.PricePolicyHistory;
+import com.dinglicom.product.domain.ProductItem;
 import java.util.Date;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -39,10 +40,16 @@ public interface PricePolicyHistoryDao extends PagingAndSortingRepository<PriceP
     int deleteByTemplateId(@Param(value = "templateId")Long templateId, @Param(value = "updatedate") Date updatedate, @Param(value = "signDelete") Boolean signDelete);
 
     @Modifying
-    @Query("update PricePolicyHistory t set t.currentPolicy=:currentPolicy, t.lastUpdateDate=:updatedate where t.dealarStation.id=:ids and t.signDelete=:signDelete")
+    @Query("update PricePolicyHistory t set t.currentPolicy=:currentPolicy, t.lastUpdateDate=:updatedate where t.dealarStation.id in (:ids) and t.signDelete=:signDelete")
     int updateByDealarIds(@Param(value = "ids") List<Long> ids, @Param(value = "currentPolicy") Boolean currentPolicy, @Param(value = "updatedate") Date updatedate, @Param(value = "signDelete") Boolean signDelete); 
 
     @Modifying
     @Query("update PricePolicyHistory t set t.currentPolicy=:currentPolicy, t.lastUpdateDate=:updatedate where t.template.id=:templateId and t.signDelete=:signDelete")
     int updateByTemplateId(@Param(value = "templateId") Long templateId, @Param(value = "currentPolicy") Boolean currentPolicy, @Param(value = "updatedate") Date updatedate, @Param(value = "signDelete") Boolean signDelete);
+    
+    @Query("select new com.dinglicom.product.domain.ProductItem(t.product.id, t.product.shortname) from PricePolicyHistory t where t.currentPolicy=true and t.dealarStation.id=:dealarId and t.signDelete=:signDelete")
+    List<ProductItem> findDealarProduct(@Param(value = "dealarId") Long dealarId, @Param(value = "signDelete") Boolean signDelete);
+    
+    @Query("from PricePolicyHistory t where t.currentPolicy=true and t.dealarStation.id=:dealarId and t.signDelete=:signDelete")
+    List<PricePolicyHistory> findDealarCurrentPricePolicy(@Param(value = "dealarId") Long dealarId, @Param(value = "signDelete") Boolean signDelete);
 }

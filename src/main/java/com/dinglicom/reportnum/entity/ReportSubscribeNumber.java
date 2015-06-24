@@ -29,7 +29,7 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
     private int quarter;//季度
     private int month;//月
     private int day;//日
-    private SysOranizagion org;//上报单位（经销商、奶站）
+    private SysOranizagion org;//上报单位（奶站）
     private String orgname;//上报单位名称
     private UserProduct product;//产品
     private String productname;//产品名称
@@ -38,6 +38,8 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
     private long minusnum;//减少报量（退订报量）
     private long plusnum;//增加报量
     private long reportnum;//实际报量
+    private double price;//单价
+    private double totalPrice;//总价
     private String reportstate;//上报状态
     private UserInfo reportman;//上报人
     private String reportname;//上报人姓名
@@ -293,6 +295,36 @@ public class ReportSubscribeNumber extends EntityExt implements Serializable {
      */
     public void setReportnum(long reportnum) {
         this.reportnum = reportnum;
+    }
+
+    /**
+     * @return the price
+     */
+    @Column(name = "price")
+    public double getPrice() {
+        return price;
+    }
+
+    /**
+     * @param price the price to set
+     */
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    /**
+     * @return the totalPrice
+     */
+    @Column(name = "total_price")
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    /**
+     * @param totalPrice the totalPrice to set
+     */
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     /**

@@ -5,6 +5,7 @@
  */
 package com.dinglicom.reportnum.web;
 
+import com.dinglicom.export.view.ExcelReportDetails;
 import com.dinglicom.export.view.ExcelView;
 import com.dinglicom.export.view.LineExcelView;
 import com.dinglicom.frame.sys.domain.AdminReqBase;
@@ -17,6 +18,8 @@ import com.dinglicom.frame.web.AppControllerBase;
 import com.dinglicom.order.domain.WebQueryOrderitemReq;
 import com.dinglicom.reportnum.demain.LineDistributionQuery;
 import com.dinglicom.reportnum.demain.LineResp;
+import com.dinglicom.reportnum.demain.ReportDetailReq;
+import com.dinglicom.reportnum.demain.ReportDetailRespItem;
 import com.dinglicom.reportnum.demain.ReportNumberPostReq;
 import com.dinglicom.reportnum.demain.ReportnumberTimeReq;
 import com.dinglicom.reportnum.demain.WebEverydayorgListResp;
@@ -33,6 +36,7 @@ import com.dinglicom.reportnum.service.ReportnumberTimeService;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
@@ -427,5 +431,64 @@ public class ReportSubscribeNumberController extends AppControllerBase {
         model.put("reportdate", req.getDate());
         model.put("linereportlist", msg);
         return new ModelAndView(new LineExcelView(), model);
+    }
+
+    /**
+     * 查询报量明细
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/reportdetails")
+    public @ResponseBody
+    BaseMsgBean queryReportDetails(ReportDetailReq req) {
+        BaseMsgBean msg = new BaseMsgBean();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Query report details.", req.getDate());
+        if (null == admin || 0 >= req.getMid() || 0 >= req.getPage() || 0 >= req.getNum() || null == req.getDate()) {
+            msg.setCode(1);
+            msg.setResult("未输入必须字段或者无有效权限");
+            return msg;
+        }
+
+        try {
+            msg = reportSubscribeNumberService.findReportDetails(req);
+            msg.setResult("成功");
+        } catch (Exception e) {
+            LOG.warn("Query report details fail.", e);
+            msg.setCode(1);
+            msg.setResult("失败");
+            return msg;
+        }
+        return msg;
+    }
+    
+    
+    /**
+     * 查询报量明细excel导出
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/exportreportdetails")
+    public ModelAndView exportReportDetails(ReportDetailReq req) {
+        BaseMsgBean msg = new BaseMsgBean();
+        UserInfo admin = validateToken(sysTokenService, msg, req.getMid(), req.getToken());
+        LOG.info("Export query report details.", req.getDate());
+        if (null == admin || 0 >= req.getMid() || null == req.getDate()) {
+            return null;
+        }
+        List<ReportDetailRespItem> data = null;
+        try {
+            data = reportSubscribeNumberService.findReportDetailAll(req);
+        } catch (Exception e) {
+            LOG.warn("Export query report list details.", e);
+        }
+        if(null == data) {
+            return null;
+        }
+        
+        Map model = new HashMap();
+        model.put("reportdate", req.getDate());
+        model.put("reportnumberdetails", data);
+        return new ModelAndView(new ExcelReportDetails(), model);
     }
 }

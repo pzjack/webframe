@@ -10,6 +10,9 @@ import com.dinglicom.frame.sys.domain.BaseMsgBean;
 import com.dinglicom.frame.sys.entity.UserInfo;
 import com.dinglicom.reportform.domain.SalemanTmp;
 import com.dinglicom.reportnum.demain.LineDataTmp;
+import com.dinglicom.reportnum.demain.ReportDetailReq;
+import com.dinglicom.reportnum.demain.ReportDetailResp;
+import com.dinglicom.reportnum.demain.ReportDetailRespItem;
 import com.dinglicom.reportnum.demain.ReportNumberPostReq;
 import com.dinglicom.reportnum.demain.WebReportnumberDetailResp;
 import com.dinglicom.reportnum.entity.ReportSubscribeNumber;
@@ -17,7 +20,6 @@ import java.util.Calendar;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 /**
  *
@@ -151,4 +153,18 @@ public interface ReportSubscribeNumberService {
      * @return 
      */
     List<SalemanTmp> querySalemanbydayDepid(Integer year, Integer month, Integer day, Long depid);
+    
+    /**
+     * 查询报量明细(分页)
+     * @param req
+     * @return 
+     */
+    ReportDetailResp findReportDetails(ReportDetailReq req);
+    
+    /**
+     * 查询报量明细(不分页，返回所有结果)
+     * @param req
+     * @return 
+     */
+    List<ReportDetailRespItem> findReportDetailAll(ReportDetailReq req);
 }

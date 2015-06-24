@@ -152,3 +152,50 @@ mysql:
         createdate DATETIME,
         primary key (id)
      ) ENGINE= InnoDB DEFAULT CHARSET=utf8;
+
+oracle:
+     CREATE TABLE price_template (
+        id NUMBER(20) NOT NULL,
+        name VARCHAR2(120),
+        temptable_desc VARCHAR2(300),
+        apply NUMBER(1),
+        createman VARCHAR2(60),
+        sign_delete NUMBER(1),
+        createdate TIMESTAMP,
+        primary key (id)
+     );
+
+     CREATE TABLE price_template_detail (
+        id NUMBER(20) NOT NULL,
+        product_id NUMBER(20),
+        product_name VARCHAR2(120),
+        product_type NUMBER,
+        report_price DECIMAL(10,4),
+        template_id NUMBER(20),
+        last_update_man VARCHAR2(60),
+        last_update_date TIMESTAMP,
+        sign_delete NUMBER(1),
+        createdate TIMESTAMP,
+        primary key (id)
+     );
+
+     CREATE TABLE price_policy_history (
+        id NUMBER(20) NOT NULL,
+        dealar_station_id NUMBER(20),
+        template_detail_id NUMBER(20),
+        template_id NUMBER(20),
+        product_id NUMBER(20),
+        current_policy NUMBER(1),
+        last_update_date TIMESTAMP,
+        createman VARCHAR2(60),
+        sign_delete NUMBER(1),
+        createdate TIMESTAMP,
+        primary key (id)
+     );
+
+report_subscribe_number表增加单价和总价字段
+mysql:
+price DECIMAL(10,4),
+total_price DECIMAL(10,4),
+ALTER TABLE `duoxian`.`report_subscribe_number` ADD COLUMN `price` DECIMAL(10,4) NULL  AFTER `report_num` ;
+ALTER TABLE `duoxian`.`report_subscribe_number` ADD COLUMN `total_price` DECIMAL(10,4) NULL  AFTER `price` ;

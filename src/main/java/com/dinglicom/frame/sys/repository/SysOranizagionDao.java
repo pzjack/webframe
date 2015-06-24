@@ -166,11 +166,11 @@ public interface SysOranizagionDao extends PagingAndSortingRepository<SysOraniza
     @Query("select new com.dinglicom.pricepolicy.demain.OrgDealarRespItem(id, name) from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.name like :name and a.signDelete=:signDelete")
     List<OrgDealarRespItem> findAllDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "name")String name, @Param(value = "signDelete")Boolean signDelete);
     
-    @Query("from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.signDelete=:signDelete")
-    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "signDelete")Boolean signDelete);
+    @Query("from SysOranizagion a where (a.type =:dealar or a.type=:dlvry or (a.type =:station and a.dealer is null)) and a.signDelete=:signDelete")
+    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "dlvry")String dlvry, @Param(value = "signDelete")Boolean signDelete);
     
     
-    @Query("from SysOranizagion a where (a.type =:dealar or (a.type =:station and a.dealer is null)) and a.id in (:ids) and a.signDelete=:signDelete")
-    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "ids")List<Long> ids, @Param(value = "signDelete")Boolean signDelete);
+    @Query("from SysOranizagion a where (a.type =:dealar or a.type=:dlvry or (a.type =:station and a.dealer is null)) and a.id in (:ids) and a.signDelete=:signDelete")
+    List<SysOranizagion> findDealarAndStation(@Param(value = "station")String station, @Param(value = "dealar")String dealar, @Param(value = "dlvry")String dlvry, @Param(value = "ids")List<Long> ids, @Param(value = "signDelete")Boolean signDelete);
     
 }

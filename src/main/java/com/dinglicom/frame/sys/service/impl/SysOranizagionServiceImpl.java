@@ -424,9 +424,9 @@ public class SysOranizagionServiceImpl implements SysOranizagionService {
     @Transactional(readOnly = true)
     public List<SysOranizagion> findDealarAndNoDealarStation(List<Long> ids) {
         if(null == ids || ids.size() <= 0) {
-            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, Boolean.FALSE);
+            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, SysOranizagionService.ORG_TYPE_DLV, Boolean.FALSE);
         } else {
-            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, ids, Boolean.FALSE);
+            return sysOranizagionDao.findDealarAndStation(SysOranizagionService.ORG_TYPE_NZH, SysOranizagionService.ORG_TYPE_DEALER, SysOranizagionService.ORG_TYPE_DLV, ids, Boolean.FALSE);
         }
     }
 

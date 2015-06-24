@@ -40,6 +40,7 @@ import com.dinglicom.pricepolicy.repository.PricePolicyHistoryDao;
 import com.dinglicom.pricepolicy.repository.PriceTemplateDao;
 import com.dinglicom.pricepolicy.repository.PriceTemplateDetailDao;
 import com.dinglicom.pricepolicy.service.PriceTemplateService;
+import com.dinglicom.product.domain.ProductItem;
 import com.dinglicom.product.entity.UserProduct;
 import com.dinglicom.product.service.UserProductService;
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class PriceTemplateServiceImpl implements PriceTemplateService {
         if (null != req.getTname() && !req.getTname().isEmpty()) {
             qc.setParameter("name", likeStr);
         }
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
         if (req.getPage() <= tp && count > 0) {
             Query q = em.createQuery(createPriceTemplateHQL(false, req));
@@ -403,7 +404,7 @@ public class PriceTemplateServiceImpl implements PriceTemplateService {
         if (null != req.getQuery() && !req.getQuery().isEmpty()) {
             qc.setParameter("name", likeStr);
         }
-        int count = qc.getResultList().size();
+        long count = (Long)qc.getSingleResult();
         long tp = (count + req.getNum() - 1) / req.getNum();
         if (req.getPage() <= tp && count > 0) {
             Query q = em.createQuery(createPricePolicyHistoryHQL(false, req));
@@ -423,6 +424,18 @@ public class PriceTemplateServiceImpl implements PriceTemplateService {
         resp.setData(page.getContent());
         resp.setTotal_page(page.getTotalPages());
         return resp;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductItem> findDealarProduct(Long dealarId) {
+         return pricePolicyHistoryDao.findDealarProduct(dealarId, Boolean.FALSE);
+     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PricePolicyHistory> findDealarCurrentPricePolicy(Long dealarId) {
+        return pricePolicyHistoryDao.findDealarCurrentPricePolicy(dealarId, Boolean.FALSE);
     }
 
     /**
