@@ -69,8 +69,11 @@ public interface EveryDayEveryOrgReportDao extends PagingAndSortingRepository<Ev
     List<EveryDayEveryOrgReport> findByDateAndOrgid(@Param(value = "orgid") long orgid, @Param(value = "year") int year, @Param(value = "month") int month, @Param(value = "day") int day);
 
     //@Query("select new com.dinglicom.reportnum.demain.WebReportlistResult(a.org.id, a.orgname, a.totalnum, b.product.id, b.productname, b.reportnum) from ReportSubscribeNumber b  right join b.everyDayEveryOrgReport a  where a.year = :year and a.month = :month and a.day = :day and  a.signDelete=:signDelete")
-    @Query("select new com.dinglicom.reportnum.demain.WebReportlistResult(b.org.id, b.orgname, b.everyDayEveryOrgReport.totalnum, b.product.id, b.productname, b.reportnum) from ReportSubscribeNumber b  where b.year = :year and b.month = :month and b.day = :day and  b.signDelete=:signDelete")
-    Page<WebReportlistResult> queryReportlist(Pageable page, @Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "signDelete") Boolean signDelete);
+    @Query("select new com.dinglicom.reportnum.demain.WebReportlistResult(b.org.id, b.orgname, b.everyDayEveryOrgReport.totalnum, b.product.id, b.productname, b.reportnum) from ReportSubscribeNumber b  where b.year = :year and b.month = :month and b.day = :day and b.org.id in (:orgIds) and  b.signDelete=:signDelete")
+    List<WebReportlistResult> queryReportlist(@Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "orgIds") List<Long> orgIds, @Param(value = "signDelete") Boolean signDelete);
+    
+    @Query("select distinct b.org.id from ReportSubscribeNumber b  where b.year = :year and b.month = :month and b.day = :day and  b.signDelete=:signDelete")
+    Page<Long> queryReportlistOrgPage(Pageable page, @Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "signDelete") Boolean signDelete);
 
 //    @Query("select new com.dinglicom.reportnum.demain.WebReportlistResult(a.org.id, a.orgname, a.totalnum, b.productname, b.reportnum) from ReportSubscribeNumber b right join b.everyDayEveryOrgReport a  where a.orgtype=:orgtype and a.year = :year and a.month = :month and a.day = :day and  a.signDelete=:signDelete")
 //    Page<WebReportlistResult> queryReportlist(Pageable page, @Param(value = "orgtype") String orgtype, @Param(value = "year") Integer year, @Param(value = "month") Integer month, @Param(value = "day") Integer day, @Param(value = "signDelete") Boolean signDelete);

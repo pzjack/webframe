@@ -241,12 +241,17 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
     public WebReportlistResp queryReportlist(WebReportlistReq req) {
         WebReportlistResp resp = new WebReportlistResp();
         resp.setProducts(userProductService.findAllProduct());
-        Page<WebReportlistResult> page;
-        page = everyDayEveryOrgReportDao.queryReportlist(buildPageRequest(req.getPage(), req.getNum()), req.getYear(), req.getMonth(), req.getDay(), Boolean.FALSE);
-        if (null != page && null != page.getContent()) {
+        Page<Long> page = everyDayEveryOrgReportDao.queryReportlistOrgPage(buildPageRequest(req.getPage(), req.getNum()), req.getYear(), req.getMonth(), req.getDay(), Boolean.FALSE);
+        if(null != page && null != page.getContent()) {
+            List<WebReportlistResult> data = everyDayEveryOrgReportDao.queryReportlist(req.getYear(), req.getMonth(), req.getDay(), page.getContent(), Boolean.FALSE);
+//        }
+//        
+//        Page<WebReportlistResult> page;
+//        page = everyDayEveryOrgReportDao.queryReportlist(buildPageRequest(req.getPage(), req.getNum()), req.getYear(), req.getMonth(), req.getDay(), Boolean.FALSE);
+//        if (null != page && null != page.getContent()) {
             Map<Long, WebReportlistItemResp> cache = new HashMap<Long, WebReportlistItemResp>();
             List<WebReportlistItemResp> result = new ArrayList<WebReportlistItemResp>();
-            List<WebReportlistResult> data = page.getContent();
+//            List<WebReportlistResult> data = page.getContent();
 
             for (WebReportlistResult r : data) {
                 WebReportlistItemResp orgItem = cache.get(r.getId());

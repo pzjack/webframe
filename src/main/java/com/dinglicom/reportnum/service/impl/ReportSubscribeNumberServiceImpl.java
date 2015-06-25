@@ -469,13 +469,13 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
     @Override
     @Transactional(readOnly = true)
     public List<LineDataTmp> queryLinebydayDepid(Integer year, Integer month, Integer day, Long depid) {
-        return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
+        return reportSubscribeNumberDao.queryLinebyYearmonthdaydepid(year, month, day, depid);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LineDataTmp> queryLinebydaySalesId(Integer year, Integer month, Integer day, Long salsesid) {
-        return reportSubscribeNumberDao.queryLinebyYearmonthday(year, month, day);
+        return reportSubscribeNumberDao.queryLinebyYearmonthdaysalesid(year, month, day, salsesid);
     }
 
     @Override
