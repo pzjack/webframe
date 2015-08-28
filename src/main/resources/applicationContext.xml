@@ -26,6 +26,7 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
+    <mvc:annotation-driven />
     <!-- 
     <mvc:annotation-driven />
     <cache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
