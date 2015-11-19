@@ -1,0 +1,1 @@
+127.0.0.1 - - [16/Apr/2015:00:02:46 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 229 http-bio-8080-exec-1 422

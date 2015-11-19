@@ -1,0 +1,9 @@
+127.0.0.1 - - [14/Apr/2015:00:02:15 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 564 http-bio-8080-exec-1 507
+127.0.0.1 - - [14/Apr/2015:00:04:59 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 91 http-bio-8080-exec-1 418
+127.0.0.1 - - [14/Apr/2015:00:09:13 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 91 http-bio-8080-exec-1 515
+127.0.0.1 - - [14/Apr/2015:00:11:33 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 91 http-bio-8080-exec-1 41894
+127.0.0.1 - - [14/Apr/2015:00:12:03 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 226 http-bio-8080-exec-3 28
+127.0.0.1 - - [14/Apr/2015:00:14:34 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 226 http-bio-8080-exec-1 352
+127.0.0.1 - - [14/Apr/2015:00:19:45 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 225 http-bio-8080-exec-1 415
+127.0.0.1 - - [14/Apr/2015:00:20:14 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 90 http-bio-8080-exec-3 21
+127.0.0.1 - - [14/Apr/2015:00:23:23 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/websample/role HTTP/1.1" 200 90 http-bio-8080-exec-1 517

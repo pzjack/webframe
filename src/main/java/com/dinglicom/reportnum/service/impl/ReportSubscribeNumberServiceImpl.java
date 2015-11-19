@@ -106,7 +106,7 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
         Calendar n = Calendar.getInstance();
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_MONTH, 1);
-        c = DateUtil.getOneDayMintime(c);
+//        c = DateUtil.getOneDayMintime(c);
         n.add(Calendar.DAY_OF_MONTH, -1);
 
         int year = DateUtil.getYear(t);
@@ -117,8 +117,8 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
         int nmonth = DateUtil.getMonth(n);
         int nday = DateUtil.getDay(n);
         //下一天订单如果有暂停期满的，先恢复暂停订单
-        Calendar c2 = DateUtil.getCronDayMaxCalendar(c);
-        orderChangeRecordService.doEndPauseOrder(c2.getTime());
+//        Calendar c2 = DateUtil.getCronDayMaxCalendar(c);
+//        orderChangeRecordService.doEndPauseOrder(c2.getTime());
 
         //查找所有奶站
         List<SysOranizagion> nzhs = sysOranizagionService.findAllWorkerOrg();
@@ -403,6 +403,9 @@ public class ReportSubscribeNumberServiceImpl implements ReportSubscribeNumberSe
 
             r.setEveryDayEveryOrgReport(everyRpt);
             list.add(r);
+        }
+        if(0 == list.size() || totalNum <= 0) {
+            throw new RuntimeException("报量总数不能为0或者没有商品条目s");
         }
         everyRpt.setTotalnum(totalNum);
         everyDayEveryOrgReportService.save(everyRpt);

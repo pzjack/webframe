@@ -1,0 +1,13 @@
+127.0.0.1 - - [25/May/2015:21:12:50 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 400 968 http-bio-8080-exec-1 796
+127.0.0.1 - - [25/May/2015:21:14:09 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 400 968 http-bio-8080-exec-2 0
+127.0.0.1 - - [25/May/2015:21:15:40 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 91 http-bio-8080-exec-1 640
+127.0.0.1 - - [25/May/2015:21:19:09 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 91 http-bio-8080-exec-1 390
+127.0.0.1 - - [25/May/2015:21:22:35 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 251 http-bio-8080-exec-1 421
+0:0:0:0:0:0:0:1 - - [25/May/2015:21:24:33 +0800] "GET /webframe-1.0-SNAPSHOT/api/v1/report/exportreportdetails?mid=1&token=A3AB5193D96448B8A551021B126754A3&date=2015-05-20 HTTP/1.1" 200 - http-bio-8080-exec-3 19
+0:0:0:0:0:0:0:1 - - [25/May/2015:21:24:33 +0800] "GET /favicon.ico HTTP/1.1" 404 - http-bio-8080-exec-5 0
+0:0:0:0:0:0:0:1 - - [25/May/2015:21:25:51 +0800] "GET /webframe-1.0-SNAPSHOT/api/v1/report/exportreportdetails?mid=1&token=A3AB5193D96448B8A551021B126754A3&date=2015-05-20 HTTP/1.1" 500 6843 http-bio-8080-exec-1 477
+0:0:0:0:0:0:0:1 - - [25/May/2015:21:26:51 +0800] "GET /webframe-1.0-SNAPSHOT/api/v1/report/exportreportdetails?mid=1&token=A3AB5193D96448B8A551021B126754A3&date=2015-05-20 HTTP/1.1" 200 4621 http-bio-8080-exec-1 619
+0:0:0:0:0:0:0:1 - - [25/May/2015:21:31:29 +0800] "GET /webframe-1.0-SNAPSHOT/api/v1/report/exportreportdetails?mid=1&token=A3AB5193D96448B8A551021B126754A3&date=2015-05-20 HTTP/1.1" 200 4621 http-bio-8080-exec-1 1209
+127.0.0.1 - - [25/May/2015:21:33:36 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 91 http-bio-8080-exec-1 390
+127.0.0.1 - - [25/May/2015:21:35:44 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 91 http-bio-8080-exec-1 24383
+127.0.0.1 - - [25/May/2015:21:37:34 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/reportdetails HTTP/1.1" 200 251 http-bio-8080-exec-1 483

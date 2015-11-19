@@ -1,0 +1,7 @@
+127.0.0.1 - - [18/May/2015:20:33:29 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/disable HTTP/1.1" 200 89 http-bio-8080-exec-1 1284
+127.0.0.1 - - [18/May/2015:20:33:30 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/create HTTP/1.1" 200 66 http-bio-8080-exec-2 570
+127.0.0.1 - - [18/May/2015:20:37:56 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/disable HTTP/1.1" 200 111 http-bio-8080-exec-1 841
+127.0.0.1 - - [18/May/2015:20:40:56 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/disable HTTP/1.1" 200 53 http-bio-8080-exec-1 522
+127.0.0.1 - - [18/May/2015:21:49:53 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/historyquery HTTP/1.1" 200 89 http-bio-8080-exec-1 405
+127.0.0.1 - - [18/May/2015:21:51:12 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/historyquery HTTP/1.1" 200 320 http-bio-8080-exec-3 578
+127.0.0.1 - - [18/May/2015:21:52:20 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/pricepolicy/historyquery HTTP/1.1" 200 860 http-bio-8080-exec-1 624

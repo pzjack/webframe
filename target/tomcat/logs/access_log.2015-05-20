@@ -1,0 +1,6 @@
+127.0.0.1 - - [20/May/2015:22:26:35 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/onedayreport HTTP/1.1" 200 151 http-bio-8080-exec-1 812
+127.0.0.1 - - [20/May/2015:22:32:00 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/onedayreport HTTP/1.1" 200 151 http-bio-8080-exec-1 204353
+127.0.0.1 - - [20/May/2015:22:32:01 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/onedayreport HTTP/1.1" 200 151 http-bio-8080-exec-2 4196
+127.0.0.1 - - [20/May/2015:22:33:33 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/onedayreport HTTP/1.1" 200 151 http-bio-8080-exec-5 62739
+127.0.0.1 - - [20/May/2015:22:35:24 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/onedayreport HTTP/1.1" 200 258 http-bio-8080-exec-1 476
+127.0.0.1 - - [20/May/2015:22:36:37 +0800] "POST /webframe-1.0-SNAPSHOT/api/v1/report/savereport HTTP/1.1" 200 53 http-bio-8080-exec-3 262

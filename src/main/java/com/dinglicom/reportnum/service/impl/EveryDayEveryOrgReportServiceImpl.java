@@ -242,7 +242,7 @@ public class EveryDayEveryOrgReportServiceImpl implements EveryDayEveryOrgReport
         WebReportlistResp resp = new WebReportlistResp();
         resp.setProducts(userProductService.findAllProduct());
         Page<Long> page = everyDayEveryOrgReportDao.queryReportlistOrgPage(buildPageRequest(req.getPage(), req.getNum()), req.getYear(), req.getMonth(), req.getDay(), Boolean.FALSE);
-        if(null != page && null != page.getContent()) {
+        if(null != page && null != page.getContent() && page.getContent().size() > 0) {
             List<WebReportlistResult> data = everyDayEveryOrgReportDao.queryReportlist(req.getYear(), req.getMonth(), req.getDay(), page.getContent(), Boolean.FALSE);
 //        }
 //        
